@@ -388,17 +388,19 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
           const data = await response.json();
           if ((data.success || data.schedule) && (Array.isArray(data.schedule) || Array.isArray(data))) {
             const scheduleData = Array.isArray(data.schedule) ? data.schedule : (Array.isArray(data) ? data : []);
-            const evalRes = TimetableValidator.evaluateSchedule(scheduleData, teachers, subjects, rooms, divisions, config);
-            set({
-              schedule: scheduleData,
-              conflicts: data.conflicts || evalRes.conflicts,
-              metrics: data.metrics || evalRes.metrics,
-              selectedDivisionId: divisions.some((d) => d.id === get().selectedDivisionId) ? get().selectedDivisionId : divisions[0]?.id || 'div-auto-1',
-              isGenerating: false,
-            });
-            saveVersion(data.engine || 'Smart Timetable Generation', 'Generated optimal conflict-free schedule.');
-            get().generateSuggestions();
-            return;
+            if (scheduleData.length > 0) {
+              const evalRes = TimetableValidator.evaluateSchedule(scheduleData, teachers, subjects, rooms, divisions, config);
+              set({
+                schedule: scheduleData,
+                conflicts: data.conflicts || evalRes.conflicts,
+                metrics: data.metrics || evalRes.metrics,
+                selectedDivisionId: divisions.some((d) => d.id === get().selectedDivisionId) ? get().selectedDivisionId : divisions[0]?.id || 'div-auto-1',
+                isGenerating: false,
+              });
+              saveVersion(data.engine || 'Smart Timetable Generation', 'Generated optimal conflict-free schedule.');
+              get().generateSuggestions();
+              return;
+            }
           }
         }
       } catch (error) {

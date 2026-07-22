@@ -59,14 +59,17 @@ export async function POST(req: Request) {
       if (pyResponse.ok) {
         const pyData = await pyResponse.json();
         const pySchedule = Array.isArray(pyData) ? pyData : (pyData.schedule || []);
-        const evalRes = TimetableValidator.evaluateSchedule(pySchedule, teachers, subjects, rooms, divisions, config);
-        return NextResponse.json({
-          success: true,
-          engine: 'Google OR-Tools CP-SAT (Python)',
-          schedule: pySchedule,
-          metrics: evalRes.metrics,
-          conflicts: evalRes.conflicts,
-        });
+        if (pySchedule.length > 0) {
+          const evalRes = TimetableValidator.evaluateSchedule(pySchedule, teachers, subjects, rooms, divisions, config);
+          return NextResponse.json({
+            success: true,
+            engine: 'Google OR-Tools CP-SAT (Python)',
+            schedule: pySchedule,
+            metrics: evalRes.metrics,
+            conflicts: evalRes.conflicts,
+          });
+        }
+        console.log('Python OR-Tools returned empty schedule. Falling back to TypeScript CSP engine.');
       }
     } catch (e) {
       // Python backend unreachable or timed out -> gracefully use our TypeScript CSP Solver
