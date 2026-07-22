@@ -1,0 +1,451 @@
+import { create } from 'zustand';
+import {
+  UserRole,
+  InstitutionConfig,
+  Teacher,
+  Subject,
+  Room,
+  ClassDivision,
+  ScheduleEntry,
+  Conflict,
+  QualityMetrics,
+  VersionHistoryItem,
+  AISuggestion,
+  DayOfWeek,
+} from '../lib/types';
+import {
+  initialInstitutionConfig,
+  initialTeachers,
+  initialSubjects,
+  initialRooms,
+  initialDivisions,
+  initialScheduleEntries,
+} from '../lib/mock-data';
+import { TimetableValidator, MoveValidationResult } from '../lib/engine/validator';
+import { CSPSolver } from '../lib/engine/csp-solver';
+import { AutoRepairEngine } from '../lib/engine/auto-repair';
+
+interface TimetableState {
+  // Current Role
+  currentRole: UserRole;
+  setRole: (role: UserRole) => void;
+
+  // Institutional Data
+  config: InstitutionConfig;
+  teachers: Teacher[];
+  subjects: Subject[];
+  rooms: Room[];
+  divisions: ClassDivision[];
+
+  // Active Schedule & Evaluation
+  schedule: ScheduleEntry[];
+  selectedDivisionId: string;
+  setSelectedDivisionId: (id: string) => void;
+  conflicts: Conflict[];
+  metrics: QualityMetrics;
+
+  // Version History (Undo / Redo / Checkpoints)
+  history: VersionHistoryItem[];
+  historyIndex: number;
+  undo: () => void;
+  redo: () => void;
+  saveVersion: (title: string, description: string) => void;
+  restoreVersion: (index: number) => void;
+
+  // Actions & Drag & Drop
+  moveEntry: (entryId: string, targetDay: DayOfWeek, targetPeriod: number, targetRoomId?: string) => MoveValidationResult;
+  addEntry: (entry: ScheduleEntry) => void;
+  activeQuickAddSlot: { day: DayOfWeek; period: number } | null;
+  openQuickAddSlot: (day: DayOfWeek, period: number) => void;
+  closeQuickAddSlot: () => void;
+  toggleLockEntry: (entryId: string) => void;
+  deleteEntry: (entryId: string) => void;
+
+  // AI Engines
+  isGenerating: boolean;
+  generateSchedule: () => void;
+  generateTimetable: () => Promise<void>;
+  autoRepair: () => number;
+  suggestions: AISuggestion[];
+  generateSuggestions: () => void;
+
+  // CRUD for Admin Management
+  updateConfig: (newConfig: Partial<InstitutionConfig>) => void;
+  addTeacher: (teacher: Teacher) => void;
+  updateTeacher: (id: string, updated: Partial<Teacher>) => void;
+  deleteTeacher: (id: string) => void;
+  addSubject: (subject: Subject) => void;
+  updateSubject: (id: string, updated: Partial<Subject>) => void;
+  deleteSubject: (id: string) => void;
+  addRoom: (room: Room) => void;
+  updateRoom: (id: string, updated: Partial<Room>) => void;
+  deleteRoom: (id: string) => void;
+  addDivision: (division: ClassDivision) => void;
+  updateDivision: (id: string, updated: Partial<ClassDivision>) => void;
+  deleteDivision: (id: string) => void;
+}
+
+export const useTimetableStore = create<TimetableState>((set, get) => {
+  // Calculate initial metrics & conflicts
+  const initialEval = TimetableValidator.evaluateSchedule(
+    initialScheduleEntries,
+    initialTeachers,
+    initialSubjects,
+    initialRooms,
+    initialDivisions,
+    initialInstitutionConfig
+  );
+
+  const initialVersion: VersionHistoryItem = {
+    id: 'ver-init',
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    title: 'Baseline Schedule',
+    description: 'Initial pre-loaded conflict-free schedule for CSE Department.',
+    schedule: initialScheduleEntries,
+    metrics: initialEval.metrics,
+  };
+
+  return {
+    currentRole: 'admin',
+    setRole: (role) => set({ currentRole: role }),
+
+    config: initialInstitutionConfig,
+    teachers: initialTeachers,
+    subjects: initialSubjects,
+    rooms: initialRooms,
+    divisions: initialDivisions,
+
+    schedule: initialScheduleEntries,
+    selectedDivisionId: initialDivisions[0]?.id || '',
+    setSelectedDivisionId: (id) => set({ selectedDivisionId: id }),
+    conflicts: initialEval.conflicts,
+    metrics: initialEval.metrics,
+
+    history: [initialVersion],
+    historyIndex: 0,
+
+    undo: () => {
+      const { historyIndex, history, teachers, subjects, rooms, divisions, config } = get();
+      if (historyIndex > 0) {
+        const prevIndex = historyIndex - 1;
+        const prevSchedule = history[prevIndex].schedule;
+        const evalRes = TimetableValidator.evaluateSchedule(prevSchedule, teachers, subjects, rooms, divisions, config);
+        set({
+          schedule: prevSchedule,
+          historyIndex: prevIndex,
+          conflicts: evalRes.conflicts,
+          metrics: evalRes.metrics,
+        });
+      }
+    },
+
+    redo: () => {
+      const { historyIndex, history, teachers, subjects, rooms, divisions, config } = get();
+      if (historyIndex < history.length - 1) {
+        const nextIndex = historyIndex + 1;
+        const nextSchedule = history[nextIndex].schedule;
+        const evalRes = TimetableValidator.evaluateSchedule(nextSchedule, teachers, subjects, rooms, divisions, config);
+        set({
+          schedule: nextSchedule,
+          historyIndex: nextIndex,
+          conflicts: evalRes.conflicts,
+          metrics: evalRes.metrics,
+        });
+      }
+    },
+
+    saveVersion: (title, description) => {
+      const { schedule, metrics, history, historyIndex } = get();
+      const newVersion: VersionHistoryItem = {
+        id: `ver-${Date.now()}`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        title,
+        description,
+        schedule: [...schedule],
+        metrics: { ...metrics },
+      };
+      const newHistory = history.slice(0, historyIndex + 1).concat(newVersion);
+      set({ history: newHistory, historyIndex: newHistory.length - 1 });
+    },
+
+    restoreVersion: (index) => {
+      const { history, teachers, subjects, rooms, divisions, config } = get();
+      if (index >= 0 && index < history.length) {
+        const targetSchedule = history[index].schedule;
+        const evalRes = TimetableValidator.evaluateSchedule(targetSchedule, teachers, subjects, rooms, divisions, config);
+        set({
+          schedule: targetSchedule,
+          historyIndex: index,
+          conflicts: evalRes.conflicts,
+          metrics: evalRes.metrics,
+        });
+      }
+    },
+
+    moveEntry: (entryId, targetDay, targetPeriod, targetRoomId) => {
+      const { schedule, teachers, subjects, rooms, divisions, config, saveVersion } = get();
+      const entry = schedule.find((e) => e.id === entryId);
+      if (!entry) {
+        return {
+          isValid: false,
+          conflicts: [],
+          warnings: ['Entry not found'],
+          metrics: get().metrics,
+        };
+      }
+
+      const roomIdToUse = targetRoomId || entry.roomId;
+      const validation = TimetableValidator.validateMove(
+        entry,
+        targetDay,
+        targetPeriod,
+        roomIdToUse,
+        schedule,
+        teachers,
+        subjects,
+        rooms,
+        divisions,
+        config
+      );
+
+      // Perform move if valid or if user opts to force (or we allow automatic swap)
+      const updatedSchedule = schedule.map((e) =>
+        e.id === entryId ? { ...e, day: targetDay, period: targetPeriod, roomId: roomIdToUse } : e
+      );
+
+      const fullEval = TimetableValidator.evaluateSchedule(updatedSchedule, teachers, subjects, rooms, divisions, config);
+      set({
+        schedule: updatedSchedule,
+        conflicts: fullEval.conflicts,
+        metrics: fullEval.metrics,
+      });
+
+      const subName = subjects.find((s) => s.id === entry.subjectId)?.name || 'Class';
+      saveVersion(`Moved ${subName}`, `Moved to ${targetDay} Period ${targetPeriod}`);
+      get().generateSuggestions();
+
+      return validation;
+    },
+
+    addEntry: (entry) => {
+      const { schedule, teachers, subjects, rooms, divisions, config, saveVersion } = get();
+      const updated = [...schedule, entry];
+      const evalRes = TimetableValidator.evaluateSchedule(updated, teachers, subjects, rooms, divisions, config);
+      set({ schedule: updated, conflicts: evalRes.conflicts, metrics: evalRes.metrics });
+      const subName = subjects.find((s) => s.id === entry.subjectId)?.name || 'Class Session';
+      saveVersion(`Added ${subName}`, `Manually scheduled at ${entry.day} Period ${entry.period}`);
+      get().generateSuggestions();
+    },
+
+    activeQuickAddSlot: null,
+    openQuickAddSlot: (day, period) => set({ activeQuickAddSlot: { day, period } }),
+    closeQuickAddSlot: () => set({ activeQuickAddSlot: null }),
+
+    toggleLockEntry: (entryId) => {
+      const { schedule, saveVersion } = get();
+      const updated = schedule.map((e) => (e.id === entryId ? { ...e, isLocked: !e.isLocked } : e));
+      set({ schedule: updated });
+      const entry = updated.find((e) => e.id === entryId);
+      saveVersion(
+        entry?.isLocked ? 'Pinned Session' : 'Unpinned Session',
+        `Manually ${entry?.isLocked ? 'locked' : 'unlocked'} entry against AI changes.`
+      );
+    },
+
+    deleteEntry: (entryId) => {
+      const { schedule, teachers, subjects, rooms, divisions, config, saveVersion } = get();
+      const updated = schedule.filter((e) => e.id !== entryId);
+      const evalRes = TimetableValidator.evaluateSchedule(updated, teachers, subjects, rooms, divisions, config);
+      set({ schedule: updated, conflicts: evalRes.conflicts, metrics: evalRes.metrics });
+      saveVersion('Deleted Session', 'Removed class session from schedule.');
+      get().generateSuggestions();
+    },
+
+    isGenerating: false,
+
+    generateTimetable: async () => {
+      set({ isGenerating: true });
+      try {
+        const { teachers, subjects, rooms, divisions, config, saveVersion } = get();
+        const response = await fetch('/api/ai/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            teachers,
+            subjects,
+            rooms,
+            divisions,
+            config,
+            existingSchedule: get().schedule,
+          }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.schedule) {
+            const evalRes = TimetableValidator.evaluateSchedule(data.schedule, teachers, subjects, rooms, divisions, config);
+            set({
+              schedule: data.schedule,
+              conflicts: evalRes.conflicts,
+              metrics: evalRes.metrics,
+              isGenerating: false,
+            });
+            saveVersion(data.source === 'ortools-cp-sat' ? 'OR-Tools CP-SAT AI Generation' : 'AI CSP Generation', 'Generated optimal conflict-free schedule.');
+            get().generateSuggestions();
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn('API route fallback triggered, using local solver');
+      }
+      // Fallback to local CSP solver
+      get().generateSchedule();
+      set({ isGenerating: false });
+    },
+
+    generateSchedule: () => {
+      const { teachers, subjects, rooms, divisions, config, schedule, saveVersion } = get();
+      const newSchedule = CSPSolver.generateSchedule(teachers, subjects, rooms, divisions, config, schedule);
+      const evalRes = TimetableValidator.evaluateSchedule(newSchedule, teachers, subjects, rooms, divisions, config);
+      set({
+        schedule: newSchedule,
+        conflicts: evalRes.conflicts,
+        metrics: evalRes.metrics,
+      });
+      saveVersion('AI Full Generation', 'Generated optimized conflict-free schedule using CSP algorithm.');
+      get().generateSuggestions();
+    },
+
+    autoRepair: () => {
+      const { schedule, teachers, subjects, rooms, divisions, config, saveVersion } = get();
+      const { repairedSchedule, resolvedCount } = AutoRepairEngine.repairConflicts(
+        schedule,
+        teachers,
+        subjects,
+        rooms,
+        divisions,
+        config
+      );
+      const evalRes = TimetableValidator.evaluateSchedule(repairedSchedule, teachers, subjects, rooms, divisions, config);
+      set({
+        schedule: repairedSchedule,
+        conflicts: evalRes.conflicts,
+        metrics: evalRes.metrics,
+      });
+      if (resolvedCount > 0) {
+        saveVersion('One-Click Auto Repair', `Automatically repaired ${resolvedCount} conflict(s).`);
+      }
+      get().generateSuggestions();
+      return resolvedCount;
+    },
+
+    suggestions: [],
+    generateSuggestions: () => {
+      const { schedule, teachers, subjects, rooms, divisions, config, conflicts, metrics } = get();
+      const suggestionsList: AISuggestion[] = [];
+
+      // 1. Conflict Warning Suggestion
+      if (conflicts.length > 0) {
+        suggestionsList.push({
+          id: 'sug-conflicts',
+          type: 'conflict_warning',
+          title: `Resolve ${conflicts.length} Active Schedule Conflict(s)`,
+          description: `Detected ${conflicts.filter((c) => c.severity === 'hard').length} hard conflict(s) across teacher/room availability. Click 'Auto Repair' to resolve them automatically while preserving your pinned edits.`,
+          impact: `+${Math.round((100 - metrics.conflictScore) * 0.45)}% Overall Score`,
+          actionable: true,
+          suggestedAction: () => get().autoRepair(),
+        });
+      }
+
+      // 2. Teacher Workload Alert
+      for (const teacher of teachers) {
+        const tEntries = schedule.filter((e) => e.teacherId === teacher.id);
+        const hours = tEntries.reduce((sum, e) => sum + e.span, 0);
+        if (hours > teacher.maxHoursPerWeek - 2 && hours <= teacher.maxHoursPerWeek) {
+          suggestionsList.push({
+            id: `sug-tload-${teacher.id}`,
+            type: 'workload_alert',
+            title: `High Workload for ${teacher.name}`,
+            description: `${teacher.name} is scheduled for ${hours}/${teacher.maxHoursPerWeek} weekly hours (${Math.round((hours / teacher.maxHoursPerWeek) * 100)}% capacity). Consider distributing remaining electives to co-faculty.`,
+            impact: 'Improves Teacher Satisfaction & Workload Balance',
+            actionable: false,
+          });
+        }
+      }
+
+      // 3. Lab Utilization Tip
+      if (metrics.labUtilization < 85) {
+        suggestionsList.push({
+          id: 'sug-lab-util',
+          type: 'optimization',
+          title: 'Increase Laboratory Utilization',
+          description: `Current Lab utilization is at ${metrics.labUtilization}%. You have open slots in AI & High Performance Computing Lab (L-201) on Friday afternoons.`,
+          impact: '+5% Lab Utilization Score',
+          actionable: true,
+          suggestedAction: () => get().generateSchedule(),
+        });
+      }
+
+      // 4. Subject Spacing Tip
+      for (const d of divisions) {
+        const friEntries = schedule.filter((e) => e.divisionId === d.id && e.day === 'Friday');
+        if (friEntries.length < config.timings.periodsPerDay - 2) {
+          suggestionsList.push({
+            id: `sug-space-${d.id}`,
+            type: 'spacing_tip',
+            title: `Balance Weekly Load for ${d.name}`,
+            description: `${d.name} has a light schedule on Friday (${friEntries.length} periods). Moving heavy morning lectures from Monday/Tuesday can optimize student cognitive load.`,
+            impact: '+6% Student Fatigue & Spacing Score',
+            actionable: false,
+          });
+          break;
+        }
+      }
+
+      set({ suggestions: suggestionsList });
+    },
+
+    updateConfig: (newConfig) => {
+      set((state) => {
+        const updated = { ...state.config, ...newConfig };
+        const evalRes = TimetableValidator.evaluateSchedule(state.schedule, state.teachers, state.subjects, state.rooms, state.divisions, updated);
+        return { config: updated, conflicts: evalRes.conflicts, metrics: evalRes.metrics };
+      });
+    },
+
+    addTeacher: (teacher) => set((state) => ({ teachers: [...state.teachers, teacher] })),
+    updateTeacher: (id, updated) => set((state) => ({
+      teachers: state.teachers.map((t) => (t.id === id ? { ...t, ...updated } : t)),
+    })),
+    deleteTeacher: (id) => set((state) => ({
+      teachers: state.teachers.filter((t) => t.id !== id),
+      schedule: state.schedule.filter((e) => e.teacherId !== id),
+    })),
+
+    addSubject: (subject) => set((state) => ({ subjects: [...state.subjects, subject] })),
+    updateSubject: (id, updated) => set((state) => ({
+      subjects: state.subjects.map((s) => (s.id === id ? { ...s, ...updated } : s)),
+    })),
+    deleteSubject: (id) => set((state) => ({
+      subjects: state.subjects.filter((s) => s.id !== id),
+      schedule: state.schedule.filter((e) => e.subjectId !== id),
+    })),
+
+    addRoom: (room) => set((state) => ({ rooms: [...state.rooms, room] })),
+    updateRoom: (id, updated) => set((state) => ({
+      rooms: state.rooms.map((r) => (r.id === id ? { ...r, ...updated } : r)),
+    })),
+    deleteRoom: (id) => set((state) => ({
+      rooms: state.rooms.filter((r) => r.id !== id),
+      schedule: state.schedule.filter((e) => e.roomId !== id),
+    })),
+
+    addDivision: (division) => set((state) => ({ divisions: [...state.divisions, division] })),
+    updateDivision: (id, updated) => set((state) => ({
+      divisions: state.divisions.map((d) => (d.id === id ? { ...d, ...updated } : d)),
+    })),
+    deleteDivision: (id) => set((state) => ({
+      divisions: state.divisions.filter((d) => d.id !== id),
+      schedule: state.schedule.filter((e) => e.divisionId !== id),
+    })),
+  };
+});
