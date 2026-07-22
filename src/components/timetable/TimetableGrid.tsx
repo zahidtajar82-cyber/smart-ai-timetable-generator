@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   DndContext,
   DragOverlay,
@@ -438,20 +439,25 @@ export const TimetableGrid: React.FC = () => {
           })}
         </div>
 
-        {/* Drag Overlay for smooth 3D visual feedback */}
-        <DragOverlay>
-          {activeDragEntry ? (
-            <div className="w-48 sm:w-56 opacity-95 scale-105 shadow-2xl pointer-events-none">
-              <ClassCard
-                entry={activeDragEntry}
-                subject={subjects.find((s) => s.id === activeDragEntry.subjectId)}
-                teacher={teachers.find((t) => t.id === activeDragEntry.teacherId)}
-                room={rooms.find((r) => r.id === activeDragEntry.roomId)}
-                currentRole={currentRole}
-              />
-            </div>
-          ) : null}
-        </DragOverlay>
+        {/* Drag Overlay rendered via createPortal directly to document.body so CSS transforms/filters in parent containers cannot trap position: fixed */}
+        {typeof document !== 'undefined' &&
+          createPortal(
+            <DragOverlay dropAnimation={null} zIndex={9999}>
+              {activeDragEntry ? (
+                <div className="w-48 sm:w-56 opacity-95 scale-105 shadow-2xl pointer-events-none">
+                  <ClassCard
+                    entry={activeDragEntry}
+                    subject={subjects.find((s) => s.id === activeDragEntry.subjectId)}
+                    teacher={teachers.find((t) => t.id === activeDragEntry.teacherId)}
+                    room={rooms.find((r) => r.id === activeDragEntry.roomId)}
+                    currentRole={currentRole}
+                    isOverlay={true}
+                  />
+                </div>
+              ) : null}
+            </DragOverlay>,
+            document.body
+          )}
       </DndContext>
 
       {/* Conflict Dialog */}

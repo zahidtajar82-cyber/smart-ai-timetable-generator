@@ -24,6 +24,7 @@ interface ClassCardProps {
   isConflict?: boolean;
   conflictDescription?: string;
   onOpenConflictDialog?: () => void;
+  isOverlay?: boolean;
 }
 
 export const ClassCard: React.FC<ClassCardProps> = ({
@@ -35,6 +36,7 @@ export const ClassCard: React.FC<ClassCardProps> = ({
   isConflict,
   conflictDescription,
   onOpenConflictDialog,
+  isOverlay,
 }) => {
   const { toggleLockEntry, deleteEntry } = useTimetableStore();
 
@@ -54,24 +56,26 @@ export const ClassCard: React.FC<ClassCardProps> = ({
       divisionId: entry.divisionId,
       type: 'ClassCard',
     },
-    disabled: currentRole !== 'admin' || entry.isLocked,
+    disabled: isOverlay || currentRole !== 'admin' || entry.isLocked,
   });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 50 : 1,
-  };
+  const style = isOverlay
+    ? { zIndex: 100 }
+    : {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 50 : 1,
+      };
 
   const isAdmin = currentRole === 'admin';
   const color = subject?.color || '#10b981';
 
   return (
     <div
-      ref={setNodeRef}
+      ref={isOverlay ? undefined : setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
+      {...(isOverlay ? {} : attributes)}
+      {...(isOverlay ? {} : listeners)}
       className={`group relative rounded-xl p-2.5 sm:p-3 border transition-all duration-200 select-none ${
         isDragging
           ? 'opacity-80 scale-105 shadow-2xl ring-2 ring-emerald-500 bg-white dark:bg-zinc-800 cursor-grabbing'
