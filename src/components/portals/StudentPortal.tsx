@@ -11,10 +11,10 @@ import {
 } from 'lucide-react';
 
 export const StudentPortal: React.FC = () => {
-  const { divisions, schedule, subjects, teachers, rooms, config } = useTimetableStore();
-  const [selectedDivisionId, setSelectedDivisionId] = useState(divisions[0]?.id || '');
+  const { divisions, schedule, subjects, teachers, rooms, config, selectedDivisionId: storeDivisionId, setSelectedDivisionId: setStoreDivisionId } = useTimetableStore();
+  const [selectedDivisionId, setSelectedDivisionId] = useState(storeDivisionId || divisions[0]?.id || '');
 
-  const activeDivision = divisions.find((d) => d.id === selectedDivisionId) || divisions[0];
+  const activeDivision = divisions.find((d) => d.id === selectedDivisionId) || divisions.find((d) => d.id === storeDivisionId) || divisions[0];
   if (!activeDivision) return null;
 
   const divisionEntries = schedule.filter((e) => e.divisionId === activeDivision.id);
@@ -59,8 +59,11 @@ export const StudentPortal: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
           <select
-            value={selectedDivisionId}
-            onChange={(e) => setSelectedDivisionId(e.target.value)}
+            value={activeDivision.id}
+            onChange={(e) => {
+              setSelectedDivisionId(e.target.value);
+              setStoreDivisionId(e.target.value);
+            }}
             className="px-4 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer"
           >
             {divisions.map((d) => (
@@ -94,21 +97,37 @@ export const StudentPortal: React.FC = () => {
           Weekly Division Schedule
         </h3>
 
-        <div className="min-w-[750px] grid grid-cols-[100px_repeat(6,_minmax(0,_1fr))] gap-2.5">
-          <div className="font-bold text-xs text-zinc-400 uppercase tracking-wider p-2">Day / Time</div>
-          {periods.map((p) => (
-            <div key={p} className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 text-center font-bold text-xs text-zinc-800 dark:text-zinc-200">
-              Period {p}
-            </div>
-          ))}
+        <div className="min-w-[760px] grid grid-cols-[100px_1fr] gap-3">
+          <div className="font-bold text-xs text-zinc-400 uppercase tracking-wider p-2">
+            Day / Period
+          </div>
+
+          <div
+            className="grid gap-2"
+            style={{
+              gridTemplateColumns: `repeat(${periods.length}, minmax(0, 1fr))`,
+            }}
+          >
+            {periods.map((p) => (
+              <div key={p} className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 text-center font-black text-xs text-zinc-800 dark:text-zinc-200">
+                Period {p}
+              </div>
+            ))}
+          </div>
 
           {config.workingDays.map((day) => (
             <React.Fragment key={day}>
-              <div className="flex items-center p-3 rounded-2xl bg-zinc-100/60 dark:bg-zinc-800/40 font-black text-xs text-zinc-800 dark:text-zinc-200">
+              <div className="flex items-center p-3 rounded-2xl bg-zinc-100/60 dark:bg-zinc-800/40 font-black text-sm text-zinc-800 dark:text-zinc-200">
                 {day}
               </div>
 
-              {periods.map((p) => {
+              <div
+                className="grid gap-2"
+                style={{
+                  gridTemplateColumns: `repeat(${periods.length}, minmax(0, 1fr))`,
+                }}
+              >
+                {periods.map((p) => {
                 const covered = divisionEntries.find((e) => e.day === day && e.period < p && e.period + e.span > p);
                 if (covered) {
                   return (
@@ -175,7 +194,8 @@ export const StudentPortal: React.FC = () => {
                     </div>
                   </div>
                 );
-              })}
+                })}
+              </div>
             </React.Fragment>
           ))}
         </div>

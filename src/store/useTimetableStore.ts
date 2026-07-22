@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import {
   UserRole,
   InstitutionConfig,
@@ -95,17 +96,28 @@ interface TimetableState {
   deleteDivision: (id: string) => void;
 }
 
-export const useTimetableStore = create<TimetableState>((set, get) => {
-  const defaultMetrics: QualityMetrics = {
-    conflictScore: 100,
-    teacherSatisfaction: 100,
-    classroomUtilization: 100,
-    labUtilization: 100,
-    subjectDistribution: 100,
-    overallScore: 100,
-  };
+export const useTimetableStore = create<TimetableState>()(
+  persist(
+    (set, get) => {
+      const defaultMetrics: QualityMetrics = {
+        conflictScore: 100,
+        teacherSatisfaction: 100,
+        classroomUtilization: 100,
+        labUtilization: 100,
+        subjectDistribution: 100,
+        overallScore: 100,
+      };
 
-  return {
+      const initialEval = TimetableValidator.evaluateSchedule(
+        initialScheduleEntries,
+        initialTeachers,
+        initialSubjects,
+        initialRooms,
+        initialDivisions,
+        initialInstitutionConfig
+      );
+
+      return {
     // Auth & Onboarding defaults
     isAuthenticated: false,
     hasSeenIntro: false,
@@ -190,13 +202,22 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
     rooms: initialRooms,
     divisions: initialDivisions,
 
-    schedule: [],
+    schedule: initialScheduleEntries,
     selectedDivisionId: initialDivisions[0]?.id || '',
     setSelectedDivisionId: (id) => set({ selectedDivisionId: id }),
-    conflicts: [],
-    metrics: defaultMetrics,
+    conflicts: initialEval.conflicts,
+    metrics: initialEval.metrics,
 
-    history: [],
+    history: [
+      {
+        id: `ver-init`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        title: 'Initial Schedule',
+        description: 'Pre-generated optimal timetable.',
+        schedule: initialScheduleEntries,
+        metrics: initialEval.metrics,
+      },
+    ],
     historyIndex: 0,
 
     undo: () => {
@@ -634,4 +655,26 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
       schedule: state.schedule.filter((e) => e.divisionId !== id),
     })),
   };
-});
+},
+{
+  name: 'smart-timetable-storage',
+  partialize: (state) => ({
+    config: state.config,
+    teachers: state.teachers,
+    subjects: state.subjects,
+    rooms: state.rooms,
+    divisions: state.divisions,
+    schedule: state.schedule,
+    conflicts: state.conflicts,
+    metrics: state.metrics,
+    history: state.history,
+    historyIndex: state.historyIndex,
+    selectedDivisionId: state.selectedDivisionId,
+  }),
+  onRehydrateStorage: () => (state) => {
+    if (state && (!state.schedule || state.schedule.length === 0)) {
+      state.schedule = initialScheduleEntries;
+    }
+  },
+})
+);
