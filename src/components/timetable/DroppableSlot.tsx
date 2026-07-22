@@ -36,7 +36,7 @@ export const DroppableSlot: React.FC<DroppableSlotProps> = ({
   const slotId = `slot-${day}-${period}`;
   const { isOver, setNodeRef } = useDroppable({
     id: slotId,
-    data: { day, period },
+    data: { day, period, type: 'DroppableSlot' },
   });
 
   const isAdmin = currentRole === 'admin';

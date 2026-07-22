@@ -63,7 +63,7 @@ interface TimetableState {
   restoreVersion: (index: number) => void;
 
   // Actions & Drag & Drop
-  moveEntry: (entryId: string, targetDay: DayOfWeek, targetPeriod: number, targetRoomId?: string) => MoveValidationResult;
+  moveEntry: (entryId: string, targetDay: DayOfWeek, targetPeriod: number, targetRoomId?: string, targetEntryId?: string) => MoveValidationResult;
   addEntry: (entry: ScheduleEntry) => void;
   activeQuickAddSlot: { day: DayOfWeek; period: number } | null;
   openQuickAddSlot: (day: DayOfWeek, period: number) => void;
@@ -257,7 +257,7 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
       }
     },
 
-    moveEntry: (entryId, targetDay, targetPeriod, targetRoomId) => {
+    moveEntry: (entryId, targetDay, targetPeriod, targetRoomId, targetEntryId) => {
       const { schedule, teachers, subjects, rooms, divisions, config, saveVersion } = get();
       const entry = schedule.find((e) => e.id === entryId);
       if (!entry) {
@@ -269,23 +269,67 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
         };
       }
 
+      const oldDay = entry.day;
+      const oldPeriod = entry.period;
+      const oldRoomId = entry.roomId;
+
+      // Check if we are dropping onto an existing entry at targetDay/targetPeriod for the same division OR if targetEntryId is explicitly provided
+      const existingEntryAtTarget = schedule.find(
+        (e) => e.id !== entryId && (e.id === targetEntryId || (e.divisionId === entry.divisionId && e.day === targetDay && e.period === targetPeriod))
+      );
+
+      let updatedSchedule: ScheduleEntry[];
+      let actionDesc = '';
       const roomIdToUse = targetRoomId || entry.roomId;
+
+      if (existingEntryAtTarget) {
+        // SWAP / EXCHANGE CLASS 1 AND CLASS 2
+        // Class 1 (entry) takes Class 2's slot (targetDay, targetPeriod, targetRoomId)
+        // Class 2 (existingEntryAtTarget) takes Class 1's old slot (oldDay, oldPeriod, oldRoomId)
+        updatedSchedule = schedule.map((e) => {
+          if (e.id === entryId) {
+            return {
+              ...e,
+              day: targetDay,
+              period: targetPeriod,
+              roomId: targetRoomId || existingEntryAtTarget.roomId || e.roomId,
+            };
+          }
+          if (e.id === existingEntryAtTarget.id) {
+            return {
+              ...e,
+              day: oldDay,
+              period: oldPeriod,
+              roomId: oldRoomId || e.roomId,
+            };
+          }
+          return e;
+        });
+
+        const sub1 = subjects.find((s) => s.id === entry.subjectId)?.name || 'Class 1';
+        const sub2 = subjects.find((s) => s.id === existingEntryAtTarget.subjectId)?.name || 'Class 2';
+        actionDesc = `Exchanged ${sub1} and ${sub2}`;
+      } else {
+        // MOVE TO EMPTY SLOT
+        updatedSchedule = schedule.map((e) =>
+          e.id === entryId ? { ...e, day: targetDay, period: targetPeriod, roomId: roomIdToUse } : e
+        );
+        const subName = subjects.find((s) => s.id === entry.subjectId)?.name || 'Class';
+        actionDesc = `Moved ${subName} to ${targetDay} Period ${targetPeriod}`;
+      }
+
+      const targetRoomForValidation = targetRoomId || (existingEntryAtTarget ? existingEntryAtTarget.roomId : entry.roomId);
       const validation = TimetableValidator.validateMove(
-        entry,
+        { ...entry, day: targetDay, period: targetPeriod, roomId: targetRoomForValidation },
         targetDay,
         targetPeriod,
-        roomIdToUse,
+        targetRoomForValidation,
         schedule,
         teachers,
         subjects,
         rooms,
         divisions,
         config
-      );
-
-      // Perform move if valid or if user opts to force (or we allow automatic swap)
-      const updatedSchedule = schedule.map((e) =>
-        e.id === entryId ? { ...e, day: targetDay, period: targetPeriod, roomId: roomIdToUse } : e
       );
 
       const fullEval = TimetableValidator.evaluateSchedule(updatedSchedule, teachers, subjects, rooms, divisions, config);
@@ -295,8 +339,7 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
         metrics: fullEval.metrics,
       });
 
-      const subName = subjects.find((s) => s.id === entry.subjectId)?.name || 'Class';
-      saveVersion(`Moved ${subName}`, `Moved to ${targetDay} Period ${targetPeriod}`);
+      saveVersion(actionDesc, existingEntryAtTarget ? `Swapped positions between two sessions` : `Moved to empty slot ${targetDay} Period ${targetPeriod}`);
       get().generateSuggestions();
 
       return validation;

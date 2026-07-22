@@ -66,12 +66,27 @@ export const TimetableGrid: React.FC = () => {
     if (!over || active.id === over.id) return;
 
     const entry = schedule.find((e) => e.id === active.id);
-    const overData = over.data.current as { day: DayOfWeek; period: number } | undefined;
+    if (!entry) return;
 
-    if (entry && overData) {
-      if (entry.day === overData.day && entry.period === overData.period) return;
+    const overData = over.data.current as { day?: DayOfWeek; period?: number; entryId?: string } | undefined;
+    let targetDay: DayOfWeek | undefined = overData?.day;
+    let targetPeriod: number | undefined = overData?.period;
+    let targetEntryId: string | undefined = overData?.entryId;
 
-      const validation = moveEntry(entry.id, overData.day, overData.period);
+    // If over.id matches an existing schedule entry ID (dropped directly on another card)
+    if (!targetEntryId && typeof over.id === 'string' && schedule.some((e) => e.id === over.id)) {
+      targetEntryId = over.id as string;
+      const targetEntry = schedule.find((e) => e.id === targetEntryId);
+      if (targetEntry) {
+        targetDay = targetEntry.day;
+        targetPeriod = targetEntry.period;
+      }
+    }
+
+    if (targetDay && targetPeriod) {
+      if (entry.day === targetDay && entry.period === targetPeriod && !targetEntryId) return;
+
+      const validation = moveEntry(entry.id, targetDay, targetPeriod, undefined, targetEntryId);
 
       if (!validation.isValid && validation.conflicts.length > 0) {
         const firstHard = validation.conflicts.find((c) => c.severity === 'hard');

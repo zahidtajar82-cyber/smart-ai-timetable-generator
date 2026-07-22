@@ -47,6 +47,13 @@ export const ClassCard: React.FC<ClassCardProps> = ({
     isDragging,
   } = useSortable({
     id: entry.id,
+    data: {
+      day: entry.day,
+      period: entry.period,
+      entryId: entry.id,
+      divisionId: entry.divisionId,
+      type: 'ClassCard',
+    },
     disabled: currentRole !== 'admin' || entry.isLocked,
   });
 
