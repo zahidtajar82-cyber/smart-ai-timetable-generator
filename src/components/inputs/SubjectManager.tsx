@@ -6,7 +6,7 @@ import { Subject } from '@/lib/types';
 import { BookOpen, Plus, Trash2, Edit2, X, Check, Beaker } from 'lucide-react';
 
 export const SubjectManager: React.FC = () => {
-  const { subjects, addSubject, updateSubject, deleteSubject, teachers } = useTimetableStore();
+  const { subjects, addSubject, updateSubject, deleteSubject, teachers, divisions } = useTimetableStore();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -16,6 +16,7 @@ export const SubjectManager: React.FC = () => {
   const [hoursPerWeek, setHoursPerWeek] = useState(4);
   const [color, setColor] = useState('#10b981');
   const [assignedTeacherId, setAssignedTeacherId] = useState('');
+  const [assignedDivisionId, setAssignedDivisionId] = useState('');
   const [priority, setPriority] = useState<Subject['priority']>('normal');
 
   const colorOptions = ['#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#f59e0b', '#f97316', '#64748b', '#71717a'];
@@ -27,6 +28,7 @@ export const SubjectManager: React.FC = () => {
     setHoursPerWeek(4);
     setColor('#10b981');
     setAssignedTeacherId('');
+    setAssignedDivisionId('');
     setPriority('normal');
     setIsAdding(false);
     setEditingId(null);
@@ -39,6 +41,7 @@ export const SubjectManager: React.FC = () => {
     setHoursPerWeek(s.hoursPerWeek || s.weeklyHours || 4);
     setColor(s.color || '#10b981');
     setAssignedTeacherId(s.assignedTeacherId || '');
+    setAssignedDivisionId(s.assignedDivisionId || '');
     setPriority(s.priority || 'normal');
     setEditingId(s.id);
     setIsAdding(true);
@@ -55,6 +58,7 @@ export const SubjectManager: React.FC = () => {
         hoursPerWeek: Number(hoursPerWeek),
         color,
         assignedTeacherId: assignedTeacherId || undefined,
+        assignedDivisionId: assignedDivisionId || undefined,
         priority,
       });
     } else {
@@ -67,6 +71,7 @@ export const SubjectManager: React.FC = () => {
         hoursPerWeek: Number(hoursPerWeek),
         color,
         assignedTeacherId: assignedTeacherId || '',
+        assignedDivisionId: assignedDivisionId || undefined,
         requiresLab: type === 'Practical',
         priority,
       };
@@ -173,6 +178,22 @@ export const SubjectManager: React.FC = () => {
                 {teachers.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name} ({t.teacherId})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Assigned Division / Class</label>
+              <select
+                value={assignedDivisionId}
+                onChange={(e) => setAssignedDivisionId(e.target.value)}
+                className="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                <option value="">All Divisions / Shared</option>
+                {divisions.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
                   </option>
                 ))}
               </select>

@@ -42,6 +42,8 @@ export interface Subject {
   type: 'Theory' | 'Practical' | 'Tutorial';
   priority?: 'Labs' | 'Core' | 'Electives' | 'Sports' | 'Library' | 'Activities' | 'high' | 'normal' | 'low';
   assignedTeacherId: string;
+  assignedDivisionId?: string;
+  semester?: number;
   requiresLab: boolean;
   requiredEquipment?: string[];
   color: string; // Hex or Tailwind class for vibrant styling

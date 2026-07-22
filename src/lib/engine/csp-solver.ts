@@ -60,8 +60,19 @@ export class CSPSolver {
 
     for (const division of effDivisions) {
       for (const subject of effSubjects) {
+        // If subject has assignedDivisionId, only schedule for that division
+        if (subject.assignedDivisionId && subject.assignedDivisionId !== division.id) continue;
+        // If subject has semester defined and division has semester defined, check match
+        if (!subject.assignedDivisionId && subject.semester && division.semester && subject.semester !== division.semester) continue;
+        // If neither is defined, round-robin partition subjects across divisions so each division gets a balanced workload
+        if (!subject.assignedDivisionId && !subject.semester && effDivisions.length > 1) {
+          const subIdx = effSubjects.indexOf(subject);
+          const divIdx = effDivisions.indexOf(division);
+          if (subIdx % effDivisions.length !== divIdx) continue;
+        }
+
         // Find how many hours needed per week
-        const totalHours = subject.weeklyHours;
+        const totalHours = subject.weeklyHours || subject.hoursPerWeek || 4;
         const span = subject.type === 'Practical' ? 2 : 1;
         const numSessions = Math.ceil(totalHours / span);
 
@@ -154,26 +165,52 @@ export class CSPSolver {
           isLocked: false,
         });
       } else {
-        // If strict conflict-free placement failed for this session, place it in best minimal-conflict candidate slot
-        let fallbackSlot: { day: DayOfWeek; period: number; roomId: string } | null = null;
+        // If strict conflict-free placement failed for this session, find the slot with minimal hard conflicts and best score across the week
+        let bestFallback: { day: DayOfWeek; period: number; roomId: string; conflictCount: number; score: number } | null = null;
         for (const day of days) {
           for (const period of periods) {
-            if (period + session.span - 1 <= config.timings.periodsPerDay && availableRooms.length > 0) {
-              fallbackSlot = { day, period, roomId: availableRooms[0].id };
-              break;
+            if (period + session.span - 1 > config.timings.periodsPerDay) continue;
+            for (const room of availableRooms) {
+              const prospectiveEntry: ScheduleEntry = {
+                id: session.id,
+                subjectId: session.subject.id,
+                teacherId: session.subject.assignedTeacherId || effTeachers[0].id,
+                roomId: room.id,
+                divisionId: session.division.id,
+                day,
+                period,
+                span: session.span,
+                isLocked: false,
+              };
+              const val = TimetableValidator.validateMove(
+                prospectiveEntry,
+                day,
+                period,
+                room.id,
+                generatedEntries,
+                effTeachers,
+                effSubjects,
+                effRooms,
+                effDivisions,
+                config
+              );
+              const conflictCount = val.conflicts.length;
+              const score = val.metrics.overallScore;
+              if (!bestFallback || conflictCount < bestFallback.conflictCount || (conflictCount === bestFallback.conflictCount && score > bestFallback.score)) {
+                bestFallback = { day, period, roomId: room.id, conflictCount, score };
+              }
             }
           }
-          if (fallbackSlot) break;
         }
-        if (fallbackSlot) {
+        if (bestFallback) {
           generatedEntries.push({
             id: session.id,
             subjectId: session.subject.id,
             teacherId: session.subject.assignedTeacherId || effTeachers[0].id,
-            roomId: fallbackSlot.roomId,
+            roomId: bestFallback.roomId,
             divisionId: session.division.id,
-            day: fallbackSlot.day,
-            period: fallbackSlot.period,
+            day: bestFallback.day,
+            period: bestFallback.period,
             span: session.span,
             isLocked: false,
           });

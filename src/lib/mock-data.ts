@@ -117,6 +117,8 @@ export const initialSubjects: Subject[] = [
     type: 'Theory',
     priority: 'Core',
     assignedTeacherId: 't-1',
+    assignedDivisionId: 'div-5a',
+    semester: 5,
     requiresLab: false,
     requiredEquipment: [],
     color: '#6366f1', // Indigo
@@ -129,6 +131,8 @@ export const initialSubjects: Subject[] = [
     type: 'Practical',
     priority: 'Labs',
     assignedTeacherId: 't-1',
+    assignedDivisionId: 'div-5a',
+    semester: 5,
     requiresLab: true,
     requiredEquipment: ['GPU Cluster', 'AI Workstations'],
     color: '#8b5cf6', // Violet
@@ -141,6 +145,8 @@ export const initialSubjects: Subject[] = [
     type: 'Theory',
     priority: 'Core',
     assignedTeacherId: 't-2',
+    assignedDivisionId: 'div-3a',
+    semester: 3,
     requiresLab: false,
     requiredEquipment: [],
     color: '#3b82f6', // Blue
@@ -153,6 +159,8 @@ export const initialSubjects: Subject[] = [
     type: 'Practical',
     priority: 'Labs',
     assignedTeacherId: 't-2',
+    assignedDivisionId: 'div-3a',
+    semester: 3,
     requiresLab: true,
     requiredEquipment: ['Linux Systems'],
     color: '#0ea5e9', // Sky
@@ -165,6 +173,8 @@ export const initialSubjects: Subject[] = [
     type: 'Theory',
     priority: 'Core',
     assignedTeacherId: 't-3',
+    assignedDivisionId: 'div-3a',
+    semester: 3,
     requiresLab: false,
     requiredEquipment: [],
     color: '#10b981', // Emerald
@@ -177,6 +187,8 @@ export const initialSubjects: Subject[] = [
     type: 'Practical',
     priority: 'Labs',
     assignedTeacherId: 't-3',
+    assignedDivisionId: 'div-3a',
+    semester: 3,
     requiresLab: true,
     requiredEquipment: ['PostgreSQL Server'],
     color: '#059669', // Teal
@@ -189,6 +201,8 @@ export const initialSubjects: Subject[] = [
     type: 'Theory',
     priority: 'Core',
     assignedTeacherId: 't-4',
+    assignedDivisionId: 'div-5a',
+    semester: 5,
     requiresLab: false,
     requiredEquipment: [],
     color: '#f59e0b', // Amber
@@ -201,6 +215,8 @@ export const initialSubjects: Subject[] = [
     type: 'Practical',
     priority: 'Labs',
     assignedTeacherId: 't-4',
+    assignedDivisionId: 'div-5a',
+    semester: 5,
     requiresLab: true,
     requiredEquipment: ['Cisco Routers', 'Wireshark Workstations'],
     color: '#d97706', // Amber dark
@@ -213,6 +229,8 @@ export const initialSubjects: Subject[] = [
     type: 'Theory',
     priority: 'Core',
     assignedTeacherId: 't-5',
+    assignedDivisionId: 'div-3a',
+    semester: 3,
     requiresLab: false,
     requiredEquipment: [],
     color: '#ec4899', // Pink
@@ -225,6 +243,8 @@ export const initialSubjects: Subject[] = [
     type: 'Theory',
     priority: 'Core',
     assignedTeacherId: 't-6',
+    assignedDivisionId: 'div-3a',
+    semester: 3,
     requiresLab: false,
     requiredEquipment: [],
     color: '#a855f7', // Purple
@@ -237,6 +257,8 @@ export const initialSubjects: Subject[] = [
     type: 'Theory',
     priority: 'Electives',
     assignedTeacherId: 't-7',
+    assignedDivisionId: 'div-7a',
+    semester: 7,
     requiresLab: false,
     requiredEquipment: [],
     color: '#ef4444', // Red
@@ -249,6 +271,8 @@ export const initialSubjects: Subject[] = [
     type: 'Theory',
     priority: 'Electives',
     assignedTeacherId: 't-8',
+    assignedDivisionId: 'div-7a',
+    semester: 7,
     requiresLab: false,
     requiredEquipment: [],
     color: '#14b8a6', // Cyan/Teal
@@ -261,6 +285,8 @@ export const initialSubjects: Subject[] = [
     type: 'Theory',
     priority: 'Library',
     assignedTeacherId: 't-6',
+    assignedDivisionId: 'div-7a',
+    semester: 7,
     requiresLab: false,
     requiredEquipment: [],
     color: '#64748b', // Slate
