@@ -65,25 +65,25 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-150">
+      <div className="bg-white dark:bg-zinc-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800 mb-6">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+            <div className="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
               <Download className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-lg text-slate-900 dark:text-white">
+              <h3 className="font-bold text-lg text-zinc-900 dark:text-white">
                 Export & Share Timetable
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Choose format for institutional distribution or offline viewing
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -93,14 +93,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
           <button
             onClick={handlePrintPDF}
-            className="flex items-start space-x-3.5 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 text-left transition-all group"
+            className="flex items-start space-x-3.5 p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 hover:border-emerald-500 dark:hover:border-emerald-500 bg-zinc-50/50 dark:bg-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800 text-left transition-all group"
           >
-            <div className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-300 group-hover:scale-110 transition-transform shrink-0">
+            <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-300 group-hover:scale-110 transition-transform shrink-0">
               <Printer className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-bold text-sm text-slate-900 dark:text-white">Print / Save PDF</div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+              <div className="font-bold text-sm text-zinc-900 dark:text-white">Print / Save PDF</div>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-snug">
                 Formatted layout optimized for direct printing and offline PDF saving
               </p>
             </div>
@@ -108,14 +108,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
 
           <button
             onClick={handleExportCSV}
-            className="flex items-start space-x-3.5 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 text-left transition-all group"
+            className="flex items-start space-x-3.5 p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 hover:border-emerald-500 dark:hover:border-emerald-500 bg-zinc-50/50 dark:bg-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800 text-left transition-all group"
           >
             <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-300 group-hover:scale-110 transition-transform shrink-0">
               <Table className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-bold text-sm text-slate-900 dark:text-white">Excel / CSV Export</div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+              <div className="font-bold text-sm text-zinc-900 dark:text-white">Excel / CSV Export</div>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-snug">
                 Spreadsheet format ready for institutional ERP or Excel analytics
               </p>
             </div>
@@ -123,16 +123,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
         </div>
 
         {/* Shareable QR Code Section */}
-        <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/60 flex items-center justify-between">
           <div className="flex items-center space-x-3.5">
-            <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-indigo-100 dark:border-slate-700 text-indigo-600 dark:text-indigo-400">
+            <div className="p-3 rounded-2xl bg-white dark:bg-zinc-800 shadow-xs border border-emerald-100 dark:border-zinc-700 text-emerald-600 dark:text-emerald-400">
               <QrCode className="w-6 h-6" />
             </div>
             <div>
-              <div className="font-bold text-xs sm:text-sm text-indigo-950 dark:text-indigo-200">
+              <div className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-200">
                 Live Timetable Access Link
               </div>
-              <p className="text-[11px] text-indigo-700 dark:text-indigo-400 mt-0.5">
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
                 Students and teachers can scan or open link for real-time updates
               </p>
             </div>
@@ -140,7 +140,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
 
           <button
             onClick={handleShareQR}
-            className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center space-x-1.5 shadow-sm active:scale-95 transition-all shrink-0"
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center space-x-1.5 shadow-sm active:scale-95 transition-all shrink-0"
           >
             {copiedQR ? (
               <>

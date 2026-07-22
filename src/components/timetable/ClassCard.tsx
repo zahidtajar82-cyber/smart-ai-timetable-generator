@@ -57,7 +57,7 @@ export const ClassCard: React.FC<ClassCardProps> = ({
   };
 
   const isAdmin = currentRole === 'admin';
-  const color = subject?.color || '#6366f1';
+  const color = subject?.color || '#10b981';
 
   return (
     <div
@@ -67,10 +67,10 @@ export const ClassCard: React.FC<ClassCardProps> = ({
       {...listeners}
       className={`group relative rounded-xl p-2.5 sm:p-3 border transition-all duration-200 select-none ${
         isDragging
-          ? 'opacity-80 scale-105 shadow-2xl ring-2 ring-indigo-500 bg-white dark:bg-slate-800 cursor-grabbing'
+          ? 'opacity-80 scale-105 shadow-2xl ring-2 ring-emerald-500 bg-white dark:bg-zinc-800 cursor-grabbing'
           : isConflict
-          ? 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 shadow-sm hover:shadow-md cursor-grab'
-          : 'bg-white/90 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600 cursor-grab'
+          ? 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 shadow-xs hover:shadow-md cursor-grab'
+          : 'bg-white/90 dark:bg-zinc-800/90 border-zinc-200/80 dark:border-zinc-700/80 shadow-xs hover:shadow-md hover:border-emerald-400 dark:hover:border-emerald-600 cursor-grab'
       } ${entry.isLocked ? 'ring-1 ring-amber-400 dark:ring-amber-500/60' : ''}`}
     >
       {/* Top Color Accent Strip */}
@@ -81,7 +81,7 @@ export const ClassCard: React.FC<ClassCardProps> = ({
 
       {/* Header: Subject Code & Status Icons */}
       <div className="flex items-center justify-between mb-1 pt-0.5">
-        <span className="text-[11px] font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700/80 text-slate-700 dark:text-slate-300">
+        <span className="text-[11px] font-extrabold tracking-wider uppercase px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300">
           {subject?.code || 'SUB'}
         </span>
 
@@ -103,7 +103,7 @@ export const ClassCard: React.FC<ClassCardProps> = ({
           {/* Practical/Lab Indicator */}
           {entry.span > 1 && (
             <span
-              className="p-1 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300 font-bold text-[10px] flex items-center"
+              className="p-1 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 font-bold text-[10px] flex items-center"
               title="2-Period Practical Session"
             >
               <Beaker className="w-3 h-3 mr-0.5" />

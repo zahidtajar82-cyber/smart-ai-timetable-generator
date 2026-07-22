@@ -28,6 +28,7 @@ export interface Teacher {
   maxHoursPerWeek: number;
   unavailableDays?: DayOfWeek[];
   unavailableSlots?: string[]; // Format: "${day}-P${period}", e.g., "Monday-P1"
+  preferredSlots?: string[];
   avatar?: string;
   department?: string;
 }
@@ -48,6 +49,7 @@ export interface Subject {
 
 export interface Room {
   id: string;
+  name?: string;
   roomNumber: string;
   capacity: number;
   type: 'Classroom' | 'Laboratory';
@@ -116,7 +118,7 @@ export interface VersionHistoryItem {
 
 export interface AISuggestion {
   id: string;
-  type: 'optimization' | 'conflict_warning' | 'workload_alert' | 'spacing_tip';
+  type: 'optimization' | 'conflict_warning' | 'workload_alert' | 'spacing_tip' | 'bottleneck';
   title: string;
   description: string;
   impact: string; // e.g., "+5% Quality Score" or "Resolves 2 conflicts"

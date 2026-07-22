@@ -64,24 +64,24 @@ export const Dashboard: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Top Stat Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+        <div className="bg-white dark:bg-zinc-900 p-5 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
             <CalendarCheck className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white">
               {totalClassesScheduled}
             </div>
-            <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Classes</div>
+            <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Total Classes</div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/60 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
+        <div className="bg-white dark:bg-zinc-900 p-5 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs flex items-center space-x-4">
+          <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-950/60 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+            <div className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white">
               {teachers.length}
             </div>
             <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">Active Faculty</div>

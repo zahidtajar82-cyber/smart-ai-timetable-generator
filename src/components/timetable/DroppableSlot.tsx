@@ -46,10 +46,10 @@ export const DroppableSlot: React.FC<DroppableSlotProps> = ({
       ref={setNodeRef}
       className={`min-h-[115px] sm:min-h-[130px] rounded-2xl p-1.5 transition-all duration-200 flex flex-col justify-between border ${
         isOver
-          ? 'bg-indigo-50/90 dark:bg-indigo-950/40 border-2 border-indigo-500 shadow-inner scale-[1.01]'
+          ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-2 border-emerald-500 shadow-inner scale-[1.01]'
           : entries.length > 0
-          ? 'bg-slate-50/50 dark:bg-slate-900/40 border-slate-200/60 dark:border-slate-800'
-          : 'bg-white/40 dark:bg-slate-900/20 border-dashed border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+          ? 'bg-zinc-50/50 dark:bg-zinc-900/40 border-zinc-200/60 dark:border-zinc-800'
+          : 'bg-white/40 dark:bg-zinc-900/20 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
       }`}
     >
       {entries.length > 0 ? (
@@ -83,13 +83,13 @@ export const DroppableSlot: React.FC<DroppableSlotProps> = ({
                 if (onQuickAdd) onQuickAdd(day, period);
                 else openQuickAddSlot(day, period);
               }}
-              className="w-full h-full rounded-xl border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800 flex items-center justify-center text-slate-300 dark:text-slate-700 hover:text-indigo-500 transition-all opacity-0 group-hover:opacity-100"
+              className="w-full h-full rounded-xl border border-transparent hover:border-emerald-200 dark:hover:border-emerald-800 flex items-center justify-center text-zinc-300 dark:text-zinc-700 hover:text-emerald-500 transition-all opacity-0 group-hover:opacity-100"
               title={`Add session to ${day} Period ${period}`}
             >
               <Plus className="w-5 h-5" />
             </button>
           ) : (
-            <span className="text-xs text-slate-300 dark:text-slate-700 font-medium italic">Free Slot</span>
+            <span className="text-xs text-zinc-300 dark:text-zinc-700 font-medium italic">Free Slot</span>
           )}
         </div>
       )}

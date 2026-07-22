@@ -56,73 +56,73 @@ export const InstitutionForm: React.FC = () => {
   return (
     <form onSubmit={handleSave} className="space-y-6 max-w-4xl animate-in fade-in duration-200">
       {/* College Profile */}
-      <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
-        <div className="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-700/60">
-          <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+      <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+        <div className="flex items-center space-x-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+          <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
             <Building className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">Institution & Department Profile</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Basic metadata used across timetable headers and exports</p>
+            <h3 className="font-bold text-base text-zinc-900 dark:text-white">Institution & Department Profile</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Basic metadata used across timetable headers and exports</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">College / University Name</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">College / University Name</label>
             <input
               type="text"
               value={collegeName}
               onChange={(e) => setCollegeName(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Department / Faculty</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Department / Faculty</label>
             <input
               type="text"
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Academic Year</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Academic Year</label>
             <input
               type="text"
               value={academicYear}
               onChange={(e) => setAcademicYear(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Semester Cycle</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Semester Cycle</label>
             <input
               type="text"
               value={semester}
               onChange={(e) => setSemester(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
         </div>
       </div>
 
       {/* Working Days */}
-      <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
-        <div className="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-700/60">
-          <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400">
+      <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+        <div className="flex items-center space-x-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+          <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
             <Calendar className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">Active Working Days</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Select which days of the week classes are conducted</p>
+            <h3 className="font-bold text-base text-zinc-900 dark:text-white">Active Working Days</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Select which days of the week classes are conducted</p>
           </div>
         </div>
 
@@ -136,8 +136,8 @@ export const InstitutionForm: React.FC = () => {
                 onClick={() => toggleDay(day)}
                 className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all duration-150 flex items-center space-x-1.5 ${
                   isSelected
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
-                    : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
+                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                 }`}
               >
                 <span>{day}</span>
@@ -162,19 +162,19 @@ export const InstitutionForm: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Start Time (HH:MM)</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Start Time (HH:MM)</label>
             <input
               type="text"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
               required
               placeholder="09:00"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Periods per Day</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Periods per Day</label>
             <input
               type="number"
               min={1}
@@ -182,12 +182,12 @@ export const InstitutionForm: React.FC = () => {
               value={periodsPerDay}
               onChange={(e) => setPeriodsPerDay(Number(e.target.value))}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Period Duration (Mins)</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Period Duration (Mins)</label>
             <input
               type="number"
               min={30}
@@ -195,12 +195,12 @@ export const InstitutionForm: React.FC = () => {
               value={periodDuration}
               onChange={(e) => setPeriodDuration(Number(e.target.value))}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Lunch After Period #</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Lunch After Period #</label>
             <input
               type="number"
               min={1}
@@ -208,12 +208,12 @@ export const InstitutionForm: React.FC = () => {
               value={lunchAfter}
               onChange={(e) => setLunchAfter(Number(e.target.value))}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Lunch Duration (Mins)</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Lunch Duration (Mins)</label>
             <input
               type="number"
               min={15}
@@ -221,17 +221,17 @@ export const InstitutionForm: React.FC = () => {
               value={lunchDuration}
               onChange={(e) => setLunchDuration(Number(e.target.value))}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">End Time (Approx)</label>
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">End Time (Approx)</label>
             <input
               type="text"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
         </div>
@@ -240,7 +240,7 @@ export const InstitutionForm: React.FC = () => {
       <div className="flex items-center justify-end">
         <button
           type="submit"
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 flex items-center space-x-2 active:scale-95 transition-all"
+          className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center space-x-2 active:scale-95 transition-all"
         >
           {saved ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
           <span>{saved ? 'Configuration Saved!' : 'Save Institution Settings'}</span>

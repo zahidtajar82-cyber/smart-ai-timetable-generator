@@ -71,7 +71,7 @@ export const ConflictDialog: React.FC<ConflictDialogProps> = ({
         <div className="space-y-2 pt-2">
           <button
             onClick={handleAutoFix}
-            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-all"
+            className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition-all"
           >
             <Wrench className="w-4 h-4" />
             <span>AI Auto Fix (Recommended)</span>
@@ -80,16 +80,16 @@ export const ConflictDialog: React.FC<ConflictDialogProps> = ({
           <div className="grid grid-cols-2 gap-2 pt-1">
             <button
               onClick={handleIgnore}
-              className="py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center space-x-1.5 transition-all"
+              className="py-2.5 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-semibold text-xs flex items-center justify-center space-x-1.5 transition-all"
             >
               <Check className="w-3.5 h-3.5 text-amber-500" />
-              <span>Keep & Ignore</span>
+              <span>Ignore & Keep</span>
             </button>
             <button
-              onClick={handleCancel}
-              className="py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-950/60 text-slate-600 dark:text-slate-300 hover:text-rose-600 font-semibold text-xs transition-all"
+              onClick={onClose}
+              className="py-2.5 px-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 font-semibold text-xs transition-all"
             >
-              <span>Cancel Move</span>
+              Cancel Edit
             </button>
           </div>
         </div>

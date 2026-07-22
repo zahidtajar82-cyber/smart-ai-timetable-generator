@@ -32,9 +32,11 @@ export async function POST(req: Request) {
       clearTimeout(timeoutId);
 
       if (pyResponse.ok) {
-        const pySchedule = await pyResponse.json();
+        const pyData = await pyResponse.json();
+        const pySchedule = Array.isArray(pyData) ? pyData : (pyData.schedule || []);
         const evalRes = TimetableValidator.evaluateSchedule(pySchedule, teachers, subjects, rooms, divisions, config);
         return NextResponse.json({
+          success: true,
           engine: 'Google OR-Tools CP-SAT (Python)',
           schedule: pySchedule,
           metrics: evalRes.metrics,
@@ -51,12 +53,13 @@ export async function POST(req: Request) {
     const evalRes = TimetableValidator.evaluateSchedule(tsSchedule, teachers, subjects, rooms, divisions, config);
 
     return NextResponse.json({
+      success: true,
       engine: 'TypeScript Constraint Satisfaction Engine (CSP + Hill Climbing)',
       schedule: tsSchedule,
       metrics: evalRes.metrics,
       conflicts: evalRes.conflicts,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Error generating schedule' }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message || 'Error generating schedule' }, { status: 500 });
   }
 }

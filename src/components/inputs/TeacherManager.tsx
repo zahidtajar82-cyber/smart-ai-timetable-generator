@@ -89,8 +89,8 @@ export const TeacherManager: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-200">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-bold text-lg text-slate-900 dark:text-white">Faculty & Teacher Roster</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <h3 className="font-bold text-lg text-zinc-900 dark:text-white">Faculty & Teacher Roster</h3>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Manage teaching staff, workload capacity limits, and preferred schedule availability
           </p>
         </div>
@@ -98,7 +98,7 @@ export const TeacherManager: React.FC = () => {
         {!isAdding && (
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center space-x-2 shadow-md shadow-indigo-500/20 transition-all"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center space-x-2 shadow-md shadow-emerald-500/20 transition-all"
           >
             <UserPlus className="w-4 h-4" />
             <span>Add Faculty</span>
@@ -107,15 +107,15 @@ export const TeacherManager: React.FC = () => {
       </div>
 
       {isAdding && (
-        <form onSubmit={handleSave} className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700/60">
-            <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+        <form onSubmit={handleSave} className="bg-white dark:bg-zinc-900 rounded-3xl p-6 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+            <h4 className="font-bold text-sm text-zinc-900 dark:text-white">
               {editingId ? `Edit Faculty: ${name}` : 'Add New Faculty Member'}
             </h4>
             <button
               type="button"
               onClick={resetForm}
-              className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              className="p-1 rounded text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
             >
               <X className="w-4 h-4" />
             </button>
@@ -123,35 +123,35 @@ export const TeacherManager: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
+              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Full Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Dr. Rajesh Gupta"
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Teacher ID / Code</label>
+              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Teacher ID / Code</label>
               <input
                 type="text"
                 value={teacherId}
                 onChange={(e) => setTeacherId(e.target.value)}
                 required
                 placeholder="CSE-109"
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Preferred Shift</label>
+              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Preferred Shift</label>
               <select
                 value={preferredTime}
                 onChange={(e) => setPreferredTime(e.target.value as any)}
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="Any">Any Time (Flexible)</option>
                 <option value="Morning">Morning Shift (Periods 1-3)</option>
@@ -160,7 +160,7 @@ export const TeacherManager: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Max Hours / Day</label>
+              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Max Hours / Day</label>
               <input
                 type="number"
                 min={1}
@@ -168,12 +168,12 @@ export const TeacherManager: React.FC = () => {
                 value={maxHoursPerDay}
                 onChange={(e) => setMaxHoursPerDay(Number(e.target.value))}
                 required
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Max Hours / Week</label>
+              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Max Hours / Week</label>
               <input
                 type="number"
                 min={4}
@@ -181,39 +181,39 @@ export const TeacherManager: React.FC = () => {
                 value={maxHoursPerWeek}
                 onChange={(e) => setMaxHoursPerWeek(Number(e.target.value))}
                 required
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Specialization</label>
+              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Specialization</label>
               <input
                 type="text"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
                 placeholder="Database Systems"
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
           </div>
 
           {/* Interactive Unavailable Time Slots Grid */}
           <div className="pt-2">
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-2">
               Mark Unavailable Time Slots (Click cells to toggle red)
             </label>
-            <div className="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-2xl p-3 bg-slate-50/50 dark:bg-slate-900/40">
+            <div className="overflow-x-auto border border-zinc-200 dark:border-zinc-700 rounded-2xl p-3 bg-zinc-50/50 dark:bg-zinc-900/40">
               <div className="grid grid-cols-[100px_repeat(6,_minmax(65px,_1fr))] gap-1.5 min-w-[550px]">
-                <div className="font-bold text-[11px] text-slate-400 uppercase p-1">Day \ Period</div>
+                <div className="font-bold text-[11px] text-zinc-400 uppercase p-1">Day \ Period</div>
                 {periods.map((p) => (
-                  <div key={p} className="text-center font-bold text-xs text-slate-600 dark:text-slate-300 p-1">
+                  <div key={p} className="text-center font-bold text-xs text-zinc-600 dark:text-zinc-300 p-1">
                     P{p}
                   </div>
                 ))}
 
                 {config.workingDays.map((day) => (
                   <React.Fragment key={day}>
-                    <div className="font-bold text-xs text-slate-800 dark:text-slate-200 p-1.5 flex items-center">
+                    <div className="font-bold text-xs text-zinc-800 dark:text-zinc-200 p-1.5 flex items-center">
                       {day}
                     </div>
                     {periods.map((p) => {
@@ -227,7 +227,7 @@ export const TeacherManager: React.FC = () => {
                           className={`p-2 rounded-xl font-bold text-xs transition-all ${
                             isUnavail
                               ? 'bg-rose-500 text-white shadow-xs'
-                              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                              : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                           }`}
                           title={isUnavail ? 'Marked Unavailable (Click to clear)' : 'Click to mark unavailable'}
                         >
@@ -245,13 +245,13 @@ export const TeacherManager: React.FC = () => {
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 font-semibold text-xs text-slate-700 dark:text-slate-200 transition-all"
+              className="px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 font-semibold text-xs text-zinc-700 dark:text-zinc-200 transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition-all"
+              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20 transition-all"
             >
               {editingId ? 'Update Faculty' : 'Save Faculty'}
             </button>
@@ -264,24 +264,24 @@ export const TeacherManager: React.FC = () => {
         {teachers.map((t) => (
           <div
             key={t.id}
-            className="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-700 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+            className="bg-white dark:bg-zinc-900 rounded-3xl p-5 border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-extrabold text-xs">
+                <span className="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs">
                   {t.teacherId}
                 </span>
                 <div className="flex items-center space-x-1">
                   <button
                     onClick={() => handleStartEdit(t)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
                     title="Edit Teacher"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => deleteTeacher(t.id)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition-all"
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition-all"
                     title="Delete Teacher"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -289,18 +289,18 @@ export const TeacherManager: React.FC = () => {
                 </div>
               </div>
 
-              <h4 className="font-extrabold text-base text-slate-900 dark:text-white leading-snug">{t.name}</h4>
-              <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{t.department || 'CSE'}</div>
+              <h4 className="font-extrabold text-base text-zinc-900 dark:text-white leading-snug">{t.name}</h4>
+              <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mt-0.5">{t.department || 'CSE'}</div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-1.5 text-xs">
-              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+            <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/60 space-y-1.5 text-xs">
+              <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
                 <span>Preferred Shift:</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">{t.preferredTime}</span>
+                <span className="font-bold text-zinc-800 dark:text-zinc-200">{t.preferredTime}</span>
               </div>
-              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+              <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
                 <span>Max Weekly Load:</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">{t.maxHoursPerWeek} Hours</span>
+                <span className="font-bold text-zinc-800 dark:text-zinc-200">{t.maxHoursPerWeek} Hours</span>
               </div>
               {(t.unavailableSlots || []).length > 0 && (
                 <div className="flex justify-between items-center text-rose-600 dark:text-rose-400 font-semibold pt-0.5">

@@ -12,12 +12,17 @@ import { ExportModal } from '@/components/common/ExportModal';
 import { InputPortal } from '@/components/inputs/InputPortal';
 import { TeacherPortal } from '@/components/portals/TeacherPortal';
 import { StudentPortal } from '@/components/portals/StudentPortal';
+import { IntroCarousel } from '@/components/auth/IntroCarousel';
+import { LoginPage } from '@/components/auth/LoginPage';
 import { DayOfWeek, ScheduleEntry } from '@/lib/types';
 import { Sparkles, Plus, X } from 'lucide-react';
 
 export default function Home() {
   const {
     currentRole,
+    isAuthenticated,
+    hasSeenIntro,
+    loadSampleData,
     generateTimetable,
     isGenerating,
     schedule,
@@ -90,8 +95,16 @@ export default function Home() {
     setQRoomId('');
   };
 
+  if (!hasSeenIntro) {
+    return <IntroCarousel />;
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
   return (
-    <div className="min-h-screen bg-slate-100/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+    <div className="min-h-screen bg-zinc-100/80 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white transition-colors duration-200">
       <Navbar
         onOpenExport={() => setExportModalOpen(true)}
         isDark={isDark}
@@ -100,11 +113,11 @@ export default function Home() {
         setActiveTab={setActiveTab}
       />
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-w-0">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden p-3 sm:p-6 lg:p-8 pb-20 md:pb-8">
+          <div className="max-w-7xl mx-auto w-full min-w-0 space-y-6">
             {/* Role Switcher Display logic */}
             {currentRole === 'teacher' ? (
               activeTab === 'analytics' ? <Dashboard /> : activeTab === 'suggestions' ? <AISuggestions /> : <TeacherPortal />
@@ -116,22 +129,30 @@ export default function Home() {
                 {activeTab === 'timetable' && (
                   <div className="space-y-6">
                     {schedule.length === 0 && !isGenerating && (
-                      <div className="bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 rounded-3xl p-8 text-white shadow-xl text-center space-y-4">
-                        <div className="w-16 h-16 rounded-3xl bg-white/10 backdrop-blur-md flex items-center justify-center mx-auto text-amber-300">
+                      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 text-center shadow-xs space-y-4">
+                        <div className="w-16 h-16 rounded-3xl bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
                           <Sparkles className="w-8 h-8 animate-spin" style={{ animationDuration: '6s' }} />
                         </div>
-                        <h2 className="text-2xl font-black">No Timetable Generated Yet</h2>
-                        <p className="text-sm text-indigo-200 max-w-md mx-auto">
-                          Click the button below or in the top right to invoke our Google OR-Tools CP-SAT scheduling engine and generate an optimal conflict-free schedule.
+                        <h2 className="text-2xl font-black text-zinc-900 dark:text-white">No Timetable Generated Yet</h2>
+                        <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mx-auto">
+                          Enter your faculty, subjects, rooms, and classes manually in the <strong>Inputs</strong> tab, or load our sample data, then click below to generate an optimal conflict-free schedule using Google OR-Tools.
                         </p>
-                        <button
-                          onClick={generateTimetable}
-                          disabled={isGenerating}
-                          className="px-8 py-3.5 rounded-2xl bg-white text-indigo-950 font-extrabold text-sm shadow-xl hover:scale-105 active:scale-95 transition-all inline-flex items-center space-x-2"
-                        >
-                          <Sparkles className="w-4 h-4 text-indigo-600" />
-                          <span>Generate Optimal Timetable Now</span>
-                        </button>
+                        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                          <button
+                            onClick={generateTimetable}
+                            disabled={isGenerating}
+                            className="px-8 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition-all inline-flex items-center space-x-2"
+                          >
+                            <Sparkles className="w-4 h-4" />
+                            <span>Generate Optimal Timetable Now</span>
+                          </button>
+                          <button
+                            onClick={loadSampleData}
+                            className="px-6 py-3.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-extrabold text-sm transition-all"
+                          >
+                            Load Sample Faculty Data
+                          </button>
+                        </div>
                       </div>
                     )}
 
@@ -154,10 +175,10 @@ export default function Home() {
 
       {/* Quick Add Modal */}
       {(quickAddModal.isOpen || activeQuickAddSlot !== null) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
-              <h3 className="font-bold text-base text-slate-900 dark:text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-zinc-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4">
+              <h3 className="font-bold text-base text-zinc-900 dark:text-white">
                 Add Session to {activeQuickAddSlot?.day || quickAddModal.day} Period {activeQuickAddSlot?.period || quickAddModal.period}
               </h3>
               <button
@@ -165,7 +186,7 @@ export default function Home() {
                   setQuickAddModal({ isOpen: false });
                   closeQuickAddSlot();
                 }}
-                className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="p-1 rounded text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -173,7 +194,7 @@ export default function Home() {
 
             <form onSubmit={handleQuickAddSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Subject</label>
+                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Subject</label>
                 <select
                   value={qSubjectId}
                   onChange={(e) => {
@@ -184,7 +205,7 @@ export default function Home() {
                     }
                   }}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="">Select Subject</option>
                   {subjects.map((s) => (
@@ -196,12 +217,12 @@ export default function Home() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Teacher</label>
+                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Teacher</label>
                 <select
                   value={qTeacherId}
                   onChange={(e) => setQTeacherId(e.target.value)}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="">Select Teacher</option>
                   {teachers.map((t) => (
@@ -213,12 +234,12 @@ export default function Home() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Room / Lab</label>
+                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">Room / Lab</label>
                 <select
                   value={qRoomId}
                   onChange={(e) => setQRoomId(e.target.value)}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="">Select Classroom or Lab</option>
                   {rooms.map((r) => (
@@ -236,13 +257,13 @@ export default function Home() {
                     setQuickAddModal({ isOpen: false });
                     closeQuickAddSlot();
                   }}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold text-xs text-slate-700 dark:text-slate-200"
+                  className="px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 font-semibold text-xs text-zinc-700 dark:text-zinc-200"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/20"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20"
                 >
                   Add Session
                 </button>

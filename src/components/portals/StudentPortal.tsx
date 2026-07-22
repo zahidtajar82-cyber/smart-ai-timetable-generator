@@ -1,29 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTimetableStore } from '@/store/useTimetableStore';
 import {
   GraduationCap,
-  Clock,
-  MapPin,
-  Calendar,
   Download,
-  BookOpen,
-  User,
   Share2,
+  MapPin,
+  User,
 } from 'lucide-react';
 
 export const StudentPortal: React.FC = () => {
-  const {
-    divisions,
-    selectedDivisionId,
-    setSelectedDivisionId,
-    schedule,
-    subjects,
-    teachers,
-    rooms,
-    config,
-  } = useTimetableStore();
+  const { divisions, schedule, subjects, teachers, rooms, config } = useTimetableStore();
+  const [selectedDivisionId, setSelectedDivisionId] = useState(divisions[0]?.id || '');
 
   const activeDivision = divisions.find((d) => d.id === selectedDivisionId) || divisions[0];
   if (!activeDivision) return null;
@@ -48,21 +37,21 @@ export const StudentPortal: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
+    <div className="space-y-6 animate-in fade-in duration-200 w-full min-w-0">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-indigo-900 via-blue-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="bg-zinc-900 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 text-white shadow-xs border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-blue-300 font-bold text-2xl border border-white/20 shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-950/60 flex items-center justify-center text-emerald-400 font-bold text-2xl border border-emerald-500/30 shrink-0">
             <GraduationCap className="w-8 h-8" />
           </div>
           <div>
-            <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/30 text-[11px] font-extrabold uppercase tracking-wider text-blue-200 mb-1">
+            <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-[11px] font-extrabold uppercase tracking-wider text-emerald-300 mb-1">
               <span>{config.department}</span>
               <span>•</span>
               <span>Student Access</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight">{activeDivision.name} Timetable</h2>
-            <p className="text-xs text-blue-200 mt-0.5">
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">{activeDivision.name} Timetable</h2>
+            <p className="text-xs text-zinc-400 mt-0.5">
               Semester {activeDivision.semester} • {activeDivision.strength} Enrolled Students
             </p>
           </div>
@@ -72,10 +61,10 @@ export const StudentPortal: React.FC = () => {
           <select
             value={selectedDivisionId}
             onChange={(e) => setSelectedDivisionId(e.target.value)}
-            className="px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-xs sm:text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer"
           >
             {divisions.map((d) => (
-              <option key={d.id} value={d.id} className="bg-slate-900 text-white">
+              <option key={d.id} value={d.id} className="bg-zinc-900 text-white">
                 {d.name} (Sem {d.semester})
               </option>
             ))}
@@ -83,7 +72,7 @@ export const StudentPortal: React.FC = () => {
 
           <button
             onClick={handleDownloadPDF}
-            className="px-5 py-2.5 rounded-xl bg-white text-indigo-950 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-lg active:scale-95 transition-all"
+            className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-lg active:scale-95 transition-all"
           >
             <Download className="w-4 h-4" />
             <span>Download Schedule</span>
@@ -91,7 +80,7 @@ export const StudentPortal: React.FC = () => {
 
           <button
             onClick={handleShare}
-            className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center transition-all"
+            className="p-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white flex items-center justify-center transition-all"
             title="Share Schedule Link"
           >
             <Share2 className="w-5 h-5" />
@@ -100,22 +89,22 @@ export const StudentPortal: React.FC = () => {
       </div>
 
       {/* Grid Schedule */}
-      <div className="bg-white dark:bg-slate-800/90 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm overflow-x-auto">
-        <h3 className="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white mb-4">
+      <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 sm:p-6 border border-zinc-200/80 dark:border-zinc-800 shadow-xs overflow-x-auto">
+        <h3 className="font-extrabold text-base sm:text-lg text-zinc-900 dark:text-white mb-4">
           Weekly Division Schedule
         </h3>
 
         <div className="min-w-[750px] grid grid-cols-[100px_repeat(6,_minmax(0,_1fr))] gap-2.5">
-          <div className="font-bold text-xs text-slate-400 uppercase tracking-wider p-2">Day / Time</div>
+          <div className="font-bold text-xs text-zinc-400 uppercase tracking-wider p-2">Day / Time</div>
           {periods.map((p) => (
-            <div key={p} className="p-2 rounded-xl bg-slate-100 dark:bg-slate-700/60 text-center font-bold text-xs text-slate-800 dark:text-slate-200">
+            <div key={p} className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 text-center font-bold text-xs text-zinc-800 dark:text-zinc-200">
               Period {p}
             </div>
           ))}
 
           {config.workingDays.map((day) => (
             <React.Fragment key={day}>
-              <div className="flex items-center p-3 rounded-2xl bg-slate-100/60 dark:bg-slate-700/40 font-black text-xs text-slate-800 dark:text-slate-200">
+              <div className="flex items-center p-3 rounded-2xl bg-zinc-100/60 dark:bg-zinc-800/40 font-black text-xs text-zinc-800 dark:text-zinc-200">
                 {day}
               </div>
 
@@ -125,7 +114,7 @@ export const StudentPortal: React.FC = () => {
                   return (
                     <div
                       key={`${day}-${p}-covered`}
-                      className="p-2 rounded-2xl bg-purple-50/40 dark:bg-purple-950/20 border border-dashed border-purple-300 dark:border-purple-800/60 text-center text-[11px] font-bold text-purple-600 dark:text-purple-400 flex items-center justify-center"
+                      className="p-2 rounded-2xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-dashed border-emerald-300 dark:border-emerald-800/60 text-center text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-center"
                     >
                       Practical Lab Continued
                     </div>
@@ -138,7 +127,7 @@ export const StudentPortal: React.FC = () => {
                   return (
                     <div
                       key={`${day}-${p}`}
-                      className="p-3 rounded-2xl bg-slate-50/40 dark:bg-slate-900/20 border border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center text-xs text-slate-300 dark:text-slate-700 font-medium italic"
+                      className="p-3 rounded-2xl bg-zinc-50/40 dark:bg-zinc-900/20 border border-dashed border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-xs text-zinc-300 dark:text-zinc-700 font-medium italic"
                     >
                       Free Period
                     </div>
@@ -154,33 +143,33 @@ export const StudentPortal: React.FC = () => {
                     key={entry.id}
                     className="p-3 rounded-2xl border text-left shadow-xs transition-all hover:shadow-md flex flex-col justify-between"
                     style={{
-                      backgroundColor: `${sub?.color || '#3b82f6'}15`,
-                      borderColor: `${sub?.color || '#3b82f6'}50`,
+                      backgroundColor: `${sub?.color || '#10b981'}15`,
+                      borderColor: `${sub?.color || '#10b981'}50`,
                     }}
                   >
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-[11px] font-black uppercase px-1.5 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                        <span className="text-[11px] font-black uppercase px-1.5 py-0.5 rounded bg-white/80 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
                           {sub?.code || 'SUB'}
                         </span>
                         {entry.span > 1 && (
-                          <span className="text-[10px] font-extrabold text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/60 px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-1.5 py-0.5 rounded">
                             2P Practical
                           </span>
                         )}
                       </div>
-                      <div className="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 leading-tight">
+                      <div className="font-bold text-xs text-zinc-900 dark:text-white line-clamp-2 leading-tight">
                         {sub?.name || 'Class Session'}
                       </div>
                     </div>
 
-                    <div className="mt-2 pt-1 border-t border-slate-200/40 dark:border-slate-700/40 space-y-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    <div className="mt-2 pt-1 border-t border-zinc-200/40 dark:border-zinc-700/40 space-y-1 text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
                       <div className="flex items-center truncate">
-                        <User className="w-3 h-3 mr-1 text-slate-400 shrink-0" />
+                        <User className="w-3 h-3 mr-1 text-zinc-400 shrink-0" />
                         <span className="truncate">{tea?.name || 'Prof. Unassigned'}</span>
                       </div>
-                      <div className="flex items-center text-slate-800 dark:text-slate-100 font-bold">
-                        <MapPin className="w-3 h-3 mr-1 text-slate-400 shrink-0" />
+                      <div className="flex items-center text-zinc-800 dark:text-zinc-100 font-bold">
+                        <MapPin className="w-3 h-3 mr-1 text-zinc-400 shrink-0" />
                         <span>{rm?.roomNumber || 'Room N/A'}</span>
                       </div>
                     </div>

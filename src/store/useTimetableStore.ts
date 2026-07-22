@@ -26,6 +26,16 @@ import { CSPSolver } from '../lib/engine/csp-solver';
 import { AutoRepairEngine } from '../lib/engine/auto-repair';
 
 interface TimetableState {
+  // Auth & Onboarding State
+  isAuthenticated: boolean;
+  hasSeenIntro: boolean;
+  currentUser: { role: UserRole; name: string; identifier: string } | null;
+  login: (role: UserRole, identifier: string, password?: string) => void;
+  logout: () => void;
+  finishIntro: () => void;
+  loadSampleData: () => void;
+  clearAllData: () => void;
+
   // Current Role
   currentRole: UserRole;
   setRole: (role: UserRole) => void;
@@ -86,26 +96,91 @@ interface TimetableState {
 }
 
 export const useTimetableStore = create<TimetableState>((set, get) => {
-  // Calculate initial metrics & conflicts
-  const initialEval = TimetableValidator.evaluateSchedule(
-    initialScheduleEntries,
-    initialTeachers,
-    initialSubjects,
-    initialRooms,
-    initialDivisions,
-    initialInstitutionConfig
-  );
-
-  const initialVersion: VersionHistoryItem = {
-    id: 'ver-init',
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    title: 'Baseline Schedule',
-    description: 'Initial pre-loaded conflict-free schedule for CSE Department.',
-    schedule: initialScheduleEntries,
-    metrics: initialEval.metrics,
+  const defaultMetrics: QualityMetrics = {
+    conflictScore: 100,
+    teacherSatisfaction: 100,
+    classroomUtilization: 100,
+    labUtilization: 100,
+    subjectDistribution: 100,
+    overallScore: 100,
   };
 
   return {
+    // Auth & Onboarding defaults
+    isAuthenticated: false,
+    hasSeenIntro: false,
+    currentUser: null,
+
+    login: (role, identifier, password) => {
+      set({
+        isAuthenticated: true,
+        currentRole: role,
+        currentUser: {
+          role,
+          identifier,
+          name: role === 'admin' ? 'System Administrator' : role === 'teacher' ? `Dr. ${identifier}` : `Student (${identifier})`,
+        },
+      });
+    },
+
+    logout: () => {
+      set({
+        isAuthenticated: false,
+        currentUser: null,
+      });
+    },
+
+    finishIntro: () => {
+      set({ hasSeenIntro: true });
+    },
+
+    loadSampleData: () => {
+      const evalRes = TimetableValidator.evaluateSchedule(
+        initialScheduleEntries,
+        initialTeachers,
+        initialSubjects,
+        initialRooms,
+        initialDivisions,
+        initialInstitutionConfig
+      );
+      set({
+        config: initialInstitutionConfig,
+        teachers: initialTeachers,
+        subjects: initialSubjects,
+        rooms: initialRooms,
+        divisions: initialDivisions,
+        schedule: initialScheduleEntries,
+        selectedDivisionId: initialDivisions[0]?.id || '',
+        conflicts: evalRes.conflicts,
+        metrics: evalRes.metrics,
+        history: [
+          {
+            id: `ver-sample-${Date.now()}`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            title: 'Sample Schedule Loaded',
+            description: 'Loaded sample CSE department faculty and pre-generated timetable.',
+            schedule: initialScheduleEntries,
+            metrics: evalRes.metrics,
+          },
+        ],
+        historyIndex: 0,
+      });
+    },
+
+    clearAllData: () => {
+      set({
+        teachers: [],
+        subjects: [],
+        rooms: [],
+        divisions: [],
+        schedule: [],
+        conflicts: [],
+        metrics: defaultMetrics,
+        history: [],
+        historyIndex: 0,
+      });
+    },
+
     currentRole: 'admin',
     setRole: (role) => set({ currentRole: role }),
 
@@ -115,13 +190,13 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
     rooms: initialRooms,
     divisions: initialDivisions,
 
-    schedule: initialScheduleEntries,
+    schedule: [],
     selectedDivisionId: initialDivisions[0]?.id || '',
     setSelectedDivisionId: (id) => set({ selectedDivisionId: id }),
-    conflicts: initialEval.conflicts,
-    metrics: initialEval.metrics,
+    conflicts: [],
+    metrics: defaultMetrics,
 
-    history: [initialVersion],
+    history: [],
     historyIndex: 0,
 
     undo: () => {
@@ -281,15 +356,16 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
         });
         if (response.ok) {
           const data = await response.json();
-          if (data.success && data.schedule) {
-            const evalRes = TimetableValidator.evaluateSchedule(data.schedule, teachers, subjects, rooms, divisions, config);
+          if ((data.success || data.schedule) && (Array.isArray(data.schedule) || Array.isArray(data))) {
+            const scheduleData = Array.isArray(data.schedule) ? data.schedule : (Array.isArray(data) ? data : []);
+            const evalRes = TimetableValidator.evaluateSchedule(scheduleData, teachers, subjects, rooms, divisions, config);
             set({
-              schedule: data.schedule,
-              conflicts: evalRes.conflicts,
-              metrics: evalRes.metrics,
+              schedule: scheduleData,
+              conflicts: data.conflicts || evalRes.conflicts,
+              metrics: data.metrics || evalRes.metrics,
               isGenerating: false,
             });
-            saveVersion(data.source === 'ortools-cp-sat' ? 'OR-Tools CP-SAT AI Generation' : 'AI CSP Generation', 'Generated optimal conflict-free schedule.');
+            saveVersion(data.engine || 'Smart Timetable Generation', 'Generated optimal conflict-free schedule.');
             get().generateSuggestions();
             return;
           }
