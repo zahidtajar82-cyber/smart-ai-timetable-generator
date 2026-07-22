@@ -179,6 +179,105 @@ export class AutoRepairEngine {
       }
     }
 
+    // PASS 3: Swap Repair between unlocked entries if strict relocation wasn't enough
+    for (let pass = 0; pass < 2; pass++) {
+      evalRes = TimetableValidator.evaluateSchedule(currentSchedule, teachers, subjects, rooms, divisions, config);
+      const currentHardCount = evalRes.conflicts.filter((c) => c.severity === 'hard').length;
+
+      const stackedEntries: ScheduleEntry[] = [];
+      const divisionSlotMap = new Map<string, ScheduleEntry[]>();
+      for (const e of currentSchedule) {
+        const key = `${e.divisionId}-${e.day}-${e.period}`;
+        if (!divisionSlotMap.has(key)) divisionSlotMap.set(key, []);
+        divisionSlotMap.get(key)!.push(e);
+      }
+      for (const [, group] of divisionSlotMap) {
+        if (group.length > 1) {
+          group.slice(1).forEach((e) => {
+            if (!e.isLocked && !stackedEntries.some((se) => se.id === e.id)) stackedEntries.push(e);
+          });
+        }
+      }
+
+      const conflictingIds = new Set<string>();
+      evalRes.conflicts.filter((c) => c.severity === 'hard').forEach((c) => {
+        c.entryIds.forEach((id) => conflictingIds.add(id));
+      });
+
+      const targetsToOptimize = currentSchedule.filter(
+        (e) => !e.isLocked && (conflictingIds.has(e.id) || stackedEntries.some((se) => se.id === e.id))
+      );
+
+      if (targetsToOptimize.length === 0 && stackedEntries.length === 0) break;
+
+      let swapped = false;
+      for (const e1 of targetsToOptimize) {
+        if (swapped) break;
+        for (const e2 of currentSchedule) {
+          if (e1.id === e2.id || e2.isLocked || e1.span !== e2.span) continue;
+
+          // Simulate swap
+          const simulated = currentSchedule.map((entry) => {
+            if (entry.id === e1.id) return { ...entry, day: e2.day, period: e2.period, roomId: e2.roomId };
+            if (entry.id === e2.id) return { ...entry, day: e1.day, period: e1.period, roomId: e1.roomId };
+            return entry;
+          });
+
+          const simEval = TimetableValidator.evaluateSchedule(simulated, teachers, subjects, rooms, divisions, config);
+          const simHardCount = simEval.conflicts.filter((c) => c.severity === 'hard').length;
+
+          const e1WasStacked = stackedEntries.some((se) => se.id === e1.id);
+          const e1StillStacked = simulated.some(
+            (entry) => entry.id !== e1.id && entry.divisionId === e1.divisionId && entry.day === e2.day && entry.period === e2.period
+          );
+          const e2BecameStacked = simulated.some(
+            (entry) => entry.id !== e2.id && entry.divisionId === e2.divisionId && entry.day === e1.day && entry.period === e1.period
+          );
+
+          if (simHardCount < currentHardCount || (e1WasStacked && !e1StillStacked && !e2BecameStacked && simHardCount <= currentHardCount)) {
+            currentSchedule = simulated;
+            resolvedCount++;
+            swapped = true;
+            break;
+          }
+        }
+      }
+      if (!swapped) break;
+    }
+
+    // PASS 4: Guaranteed De-stacking for any lingering piled classes
+    const finalSlotMap = new Map<string, ScheduleEntry[]>();
+    for (const e of currentSchedule) {
+      const key = `${e.divisionId}-${e.day}-${e.period}`;
+      if (!finalSlotMap.has(key)) finalSlotMap.set(key, []);
+      finalSlotMap.get(key)!.push(e);
+    }
+    for (const [, group] of finalSlotMap) {
+      if (group.length > 1) {
+        group.slice(1).forEach((e) => {
+          if (e.isLocked) return;
+          // Find first slot in week not occupied by this division
+          for (const day of config.workingDays) {
+            let moved = false;
+            for (let period = 1; period <= config.timings.periodsPerDay - e.span + 1; period++) {
+              const busy = currentSchedule.some(
+                (se) => se.id !== e.id && se.divisionId === e.divisionId && se.day === day && se.period === period
+              );
+              if (!busy) {
+                currentSchedule = currentSchedule.map((entry) =>
+                  entry.id === e.id ? { ...entry, day, period } : entry
+                );
+                resolvedCount++;
+                moved = true;
+                break;
+              }
+            }
+            if (moved) break;
+          }
+        });
+      }
+    }
+
     return { repairedSchedule: currentSchedule, resolvedCount };
   }
 }

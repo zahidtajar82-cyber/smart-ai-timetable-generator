@@ -319,12 +319,15 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
       }
 
       const targetRoomForValidation = targetRoomId || (existingEntryAtTarget ? existingEntryAtTarget.roomId : entry.roomId);
+      const scheduleForValidation = existingEntryAtTarget
+        ? schedule.filter((e) => e.id !== existingEntryAtTarget.id)
+        : schedule;
       const validation = TimetableValidator.validateMove(
         { ...entry, day: targetDay, period: targetPeriod, roomId: targetRoomForValidation },
         targetDay,
         targetPeriod,
         targetRoomForValidation,
-        schedule,
+        scheduleForValidation,
         teachers,
         subjects,
         rooms,

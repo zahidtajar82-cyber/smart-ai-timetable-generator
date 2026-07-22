@@ -7,8 +7,9 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
-  DragEndEvent,
   DragStartEvent,
+  DragEndEvent,
+  closestCenter,
 } from '@dnd-kit/core';
 import { useTimetableStore } from '@/store/useTimetableStore';
 import { DayOfWeek, ScheduleEntry } from '@/lib/types';
@@ -85,6 +86,16 @@ export const TimetableGrid: React.FC = () => {
 
     if (targetDay && targetPeriod) {
       if (entry.day === targetDay && entry.period === targetPeriod && !targetEntryId) return;
+
+      // If targetEntryId wasn't set (dropped on DroppableSlot container) but the target slot already has a card for this division, grab it to perform a clean swap!
+      if (!targetEntryId) {
+        const existingInSlot = schedule.find(
+          (e) => e.id !== entry.id && e.divisionId === entry.divisionId && e.day === targetDay && e.period === targetPeriod
+        );
+        if (existingInSlot) {
+          targetEntryId = existingInSlot.id;
+        }
+      }
 
       const validation = moveEntry(entry.id, targetDay, targetPeriod, undefined, targetEntryId);
 
@@ -219,7 +230,12 @@ export const TimetableGrid: React.FC = () => {
       </div>
 
       {/* Grid Layouts for Displayed Divisions */}
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
         <div className="space-y-10 w-full min-w-0">
           {displayedDivisions.map((division) => {
             if (!division) return null;
