@@ -340,8 +340,38 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
 
     generateTimetable: async () => {
       set({ isGenerating: true });
+      let { teachers, subjects, rooms, divisions, selectedDivisionId, config, saveVersion } = get();
+      
+      if (teachers.length === 0) {
+        teachers = [{ id: 'teacher-auto-1', name: 'General Faculty Member', teacherId: 'FAC-101', preferredTime: 'Any', maxHoursPerDay: 6, maxHoursPerWeek: 30, preferredSlots: [] }];
+      }
+      if (rooms.length === 0) {
+        rooms = [
+          { id: 'room-auto-1', name: 'Lecture Hall 101', roomNumber: '101', capacity: 60, type: 'Classroom' },
+          { id: 'room-auto-lab', name: 'Computer Lab 201', roomNumber: '201', capacity: 40, type: 'Laboratory' }
+        ];
+      }
+      if (divisions.length === 0) {
+        divisions = [{ id: 'div-auto-1', name: 'Semester 1 - Div A', semester: 1, strength: 50 }];
+      }
+      if (subjects.length === 0) {
+        subjects = [
+          { id: 'sub-auto-1', name: 'Core Theory & Practice', code: 'CTP101', type: 'Theory', weeklyHours: 4, assignedTeacherId: teachers[0].id, priority: 'Labs', requiresLab: false, color: 'emerald' },
+          { id: 'sub-auto-2', name: 'Applied Computing Lab', code: 'ACL102', type: 'Practical', weeklyHours: 2, assignedTeacherId: teachers[0].id, priority: 'Labs', requiresLab: true, color: 'teal' }
+        ];
+      } else {
+        subjects = subjects.map((sub, i) => ({
+          ...sub,
+          assignedTeacherId: sub.assignedTeacherId || teachers[i % teachers.length].id,
+          color: sub.color || 'emerald',
+        }));
+      }
+      if (!divisions.some((d) => d.id === selectedDivisionId)) {
+        selectedDivisionId = divisions[0]?.id || 'div-auto-1';
+      }
+      set({ teachers, subjects, rooms, divisions, selectedDivisionId });
+
       try {
-        const { teachers, subjects, rooms, divisions, config, saveVersion } = get();
         const response = await fetch('/api/ai/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -363,6 +393,7 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
               schedule: scheduleData,
               conflicts: data.conflicts || evalRes.conflicts,
               metrics: data.metrics || evalRes.metrics,
+              selectedDivisionId: divisions.some((d) => d.id === get().selectedDivisionId) ? get().selectedDivisionId : divisions[0]?.id || 'div-auto-1',
               isGenerating: false,
             });
             saveVersion(data.engine || 'Smart Timetable Generation', 'Generated optimal conflict-free schedule.');
@@ -379,13 +410,44 @@ export const useTimetableStore = create<TimetableState>((set, get) => {
     },
 
     generateSchedule: () => {
-      const { teachers, subjects, rooms, divisions, config, schedule, saveVersion } = get();
+      let { teachers, subjects, rooms, divisions, selectedDivisionId, config, schedule, saveVersion } = get();
+      
+      if (teachers.length === 0) {
+        teachers = [{ id: 'teacher-auto-1', name: 'General Faculty Member', teacherId: 'FAC-101', preferredTime: 'Any', maxHoursPerDay: 6, maxHoursPerWeek: 30, preferredSlots: [] }];
+      }
+      if (rooms.length === 0) {
+        rooms = [
+          { id: 'room-auto-1', name: 'Lecture Hall 101', roomNumber: '101', capacity: 60, type: 'Classroom' },
+          { id: 'room-auto-lab', name: 'Computer Lab 201', roomNumber: '201', capacity: 40, type: 'Laboratory' }
+        ];
+      }
+      if (divisions.length === 0) {
+        divisions = [{ id: 'div-auto-1', name: 'Semester 1 - Div A', semester: 1, strength: 50 }];
+      }
+      if (subjects.length === 0) {
+        subjects = [
+          { id: 'sub-auto-1', name: 'Core Theory & Practice', code: 'CTP101', type: 'Theory', weeklyHours: 4, assignedTeacherId: teachers[0].id, priority: 'Labs', requiresLab: false, color: 'emerald' },
+          { id: 'sub-auto-2', name: 'Applied Computing Lab', code: 'ACL102', type: 'Practical', weeklyHours: 2, assignedTeacherId: teachers[0].id, priority: 'Labs', requiresLab: true, color: 'teal' }
+        ];
+      } else {
+        subjects = subjects.map((sub, i) => ({
+          ...sub,
+          assignedTeacherId: sub.assignedTeacherId || teachers[i % teachers.length].id,
+          color: sub.color || 'emerald',
+        }));
+      }
+      if (!divisions.some((d) => d.id === selectedDivisionId)) {
+        selectedDivisionId = divisions[0]?.id || 'div-auto-1';
+      }
+      set({ teachers, subjects, rooms, divisions, selectedDivisionId });
+
       const newSchedule = CSPSolver.generateSchedule(teachers, subjects, rooms, divisions, config, schedule);
       const evalRes = TimetableValidator.evaluateSchedule(newSchedule, teachers, subjects, rooms, divisions, config);
       set({
         schedule: newSchedule,
         conflicts: evalRes.conflicts,
         metrics: evalRes.metrics,
+        selectedDivisionId: divisions.some((d) => d.id === get().selectedDivisionId) ? get().selectedDivisionId : divisions[0]?.id || 'div-auto-1',
       });
       saveVersion('AI Full Generation', 'Generated optimized conflict-free schedule using CSP algorithm.');
       get().generateSuggestions();

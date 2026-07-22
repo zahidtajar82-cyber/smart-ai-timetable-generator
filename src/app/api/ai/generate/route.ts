@@ -5,7 +5,32 @@ import { TimetableValidator } from '@/lib/engine/validator';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { config, teachers, subjects, rooms, divisions, existingSchedule } = body;
+    let { config, teachers = [], subjects = [], rooms = [], divisions = [], existingSchedule = [] } = body;
+
+    if (!Array.isArray(teachers) || teachers.length === 0) {
+      teachers = [{ id: 'teacher-auto-1', name: 'General Faculty Member', teacherId: 'FAC-101', preferredTime: 'Any', maxHoursPerDay: 6, maxHoursPerWeek: 30, preferredSlots: [] }];
+    }
+    if (!Array.isArray(rooms) || rooms.length === 0) {
+      rooms = [
+        { id: 'room-auto-1', name: 'Lecture Hall 101', roomNumber: '101', capacity: 60, type: 'Classroom' },
+        { id: 'room-auto-lab', name: 'Computer Lab 201', roomNumber: '201', capacity: 40, type: 'Laboratory' }
+      ];
+    }
+    if (!Array.isArray(divisions) || divisions.length === 0) {
+      divisions = [{ id: 'div-auto-1', name: 'Semester 1 - Div A', semester: 1, strength: 50 }];
+    }
+    if (!Array.isArray(subjects) || subjects.length === 0) {
+      subjects = [
+        { id: 'sub-auto-1', name: 'Core Theory & Practice', code: 'CTP101', type: 'Theory', weeklyHours: 4, assignedTeacherId: teachers[0].id, priority: 'Labs', requiresLab: false, color: 'emerald' },
+        { id: 'sub-auto-2', name: 'Applied Computing Lab', code: 'ACL102', type: 'Practical', weeklyHours: 2, assignedTeacherId: teachers[0].id, priority: 'Labs', requiresLab: true, color: 'teal' }
+      ];
+    } else {
+      subjects = subjects.map((sub: any, i: number) => ({
+        ...sub,
+        assignedTeacherId: sub.assignedTeacherId || teachers[i % teachers.length].id,
+        color: sub.color || 'emerald',
+      }));
+    }
 
     // Try attempting connection to Python FastAPI OR-Tools backend first
     try {

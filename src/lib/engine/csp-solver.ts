@@ -21,6 +21,28 @@ export class CSPSolver {
     config: InstitutionConfig,
     existingEntries: ScheduleEntry[] = []
   ): ScheduleEntry[] {
+    // Sanitize and provide fallbacks if arrays are partial/empty
+    const effTeachers: Teacher[] = teachers.length > 0 ? teachers : [
+      { id: 'teacher-auto-1', name: 'General Faculty Member', teacherId: 'FAC-101', preferredTime: 'Any', maxHoursPerDay: 6, maxHoursPerWeek: 30, preferredSlots: [] }
+    ];
+    const effRooms: Room[] = rooms.length > 0 ? rooms : [
+      { id: 'room-auto-1', name: 'Lecture Hall 101', roomNumber: '101', capacity: 60, type: 'Classroom' },
+      { id: 'room-auto-lab', name: 'Computer Lab 201', roomNumber: '201', capacity: 40, type: 'Laboratory' }
+    ];
+    const effDivisions: ClassDivision[] = divisions.length > 0 ? divisions : [
+      { id: 'div-auto-1', name: 'Semester 1 - Div A', semester: 1, strength: 50 }
+    ];
+    const effSubjects: Subject[] = subjects.length > 0
+      ? subjects.map((sub, i) => ({
+          ...sub,
+          assignedTeacherId: sub.assignedTeacherId || effTeachers[i % effTeachers.length].id,
+          color: sub.color || 'emerald',
+        }))
+      : [
+          { id: 'sub-auto-1', name: 'Core Theory & Practice', code: 'CTP101', type: 'Theory', weeklyHours: 4, assignedTeacherId: effTeachers[0].id, priority: 'Labs', requiresLab: false, color: 'emerald' },
+          { id: 'sub-auto-2', name: 'Applied Computing Lab', code: 'ACL102', type: 'Practical', weeklyHours: 2, assignedTeacherId: effTeachers[0].id, priority: 'Labs', requiresLab: true, color: 'teal' }
+        ];
+
     // Preserve locked entries
     const lockedEntries = existingEntries.filter((e) => e.isLocked);
     const generatedEntries: ScheduleEntry[] = [...lockedEntries];
@@ -36,8 +58,8 @@ export class CSPSolver {
 
     let entryCounter = Date.now();
 
-    for (const division of divisions) {
-      for (const subject of subjects) {
+    for (const division of effDivisions) {
+      for (const subject of effSubjects) {
         // Find how many hours needed per week
         const totalHours = subject.weeklyHours;
         const span = subject.type === 'Practical' ? 2 : 1;
@@ -71,22 +93,23 @@ export class CSPSolver {
       let bestSlot: { day: DayOfWeek; period: number; roomId: string; score: number } | null = null;
 
       // Candidate rooms for this session
-      const candidateRooms = rooms.filter((r) => {
+      const candidateRooms = effRooms.filter((r) => {
         if (session.requiresLab) return r.type === 'Laboratory';
         // For regular theory, prefer classrooms first
         return r.type === 'Classroom' || true;
       });
+      const availableRooms = candidateRooms.length > 0 ? candidateRooms : effRooms;
 
       for (const day of days) {
         for (const period of periods) {
           // If span > 1, ensure it fits inside the day
           if (period + session.span - 1 > config.timings.periodsPerDay) continue;
 
-          for (const room of candidateRooms) {
+          for (const room of availableRooms) {
             const prospectiveEntry: ScheduleEntry = {
               id: session.id,
               subjectId: session.subject.id,
-              teacherId: session.subject.assignedTeacherId,
+              teacherId: session.subject.assignedTeacherId || effTeachers[0].id,
               roomId: room.id,
               divisionId: session.division.id,
               day,
@@ -101,10 +124,10 @@ export class CSPSolver {
               period,
               room.id,
               generatedEntries,
-              teachers,
-              subjects,
-              rooms,
-              divisions,
+              effTeachers,
+              effSubjects,
+              effRooms,
+              effDivisions,
               config
             );
 
@@ -135,8 +158,8 @@ export class CSPSolver {
         let fallbackSlot: { day: DayOfWeek; period: number; roomId: string } | null = null;
         for (const day of days) {
           for (const period of periods) {
-            if (period + session.span - 1 <= config.timings.periodsPerDay && candidateRooms.length > 0) {
-              fallbackSlot = { day, period, roomId: candidateRooms[0].id };
+            if (period + session.span - 1 <= config.timings.periodsPerDay && availableRooms.length > 0) {
+              fallbackSlot = { day, period, roomId: availableRooms[0].id };
               break;
             }
           }
@@ -146,7 +169,7 @@ export class CSPSolver {
           generatedEntries.push({
             id: session.id,
             subjectId: session.subject.id,
-            teacherId: session.subject.assignedTeacherId,
+            teacherId: session.subject.assignedTeacherId || effTeachers[0].id,
             roomId: fallbackSlot.roomId,
             divisionId: session.division.id,
             day: fallbackSlot.day,
