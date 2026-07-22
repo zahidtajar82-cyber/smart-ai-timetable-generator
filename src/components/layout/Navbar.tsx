@@ -146,12 +146,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
 
               <button
-                onClick={() => generateTimetable()}
+                onClick={async () => {
+                  await generateTimetable();
+                  if (setActiveTab) setActiveTab('timetable');
+                  window.dispatchEvent(new CustomEvent('navigateToTab', { detail: 'timetable' }));
+                }}
                 disabled={isGenerating}
-                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition-all shrink-0"
+                className="flex items-center space-x-1.5 px-4 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition-all shrink-0"
               >
-                <Sparkles className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
-                <span>{isGenerating ? 'Generating...' : 'Generate'}</span>
+                <Sparkles className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                <span>{isGenerating ? 'Generating...' : '✨ Generate Timetable'}</span>
               </button>
             </>
           )}

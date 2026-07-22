@@ -23,7 +23,7 @@ export const InputPortal: React.FC = () => {
     'institution' | 'teachers' | 'subjects' | 'rooms' | 'divisions'
   >('teachers'); // Default to teachers so users immediately see where to input faculty
 
-  const { clearAllData, loadSampleData, teachers, subjects, rooms, divisions } = useTimetableStore();
+  const { clearAllData, loadSampleData, teachers, subjects, rooms, divisions, generateTimetable, isGenerating } = useTimetableStore();
 
   const subTabs = [
     { id: 'teachers', label: 'Faculty Roster & Limits', icon: Users, count: teachers.length },
@@ -37,6 +37,11 @@ export const InputPortal: React.FC = () => {
     if (confirm('Are you sure you want to clear all current/sample faculty, subjects, rooms, and divisions? You will start with a clean slate to input your own data.')) {
       clearAllData();
     }
+  };
+
+  const handleGenerate = async () => {
+    await generateTimetable();
+    window.dispatchEvent(new CustomEvent('navigateToTab', { detail: 'timetable' }));
   };
 
   return (
@@ -78,10 +83,19 @@ export const InputPortal: React.FC = () => {
 
           <button
             onClick={() => setActiveSubTab('teachers')}
-            className="flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/25 active:scale-95 transition-all"
+            className="flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-2xl bg-zinc-800 hover:bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white font-extrabold text-xs shadow-md active:scale-95 transition-all"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Add My Teachers</span>
+          </button>
+
+          <button
+            onClick={handleGenerate}
+            disabled={isGenerating || teachers.length === 0 || subjects.length === 0}
+            className="flex items-center justify-center space-x-1.5 px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black text-xs shadow-lg shadow-emerald-500/30 active:scale-95 transition-all animate-pulse"
+          >
+            <Sparkles className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+            <span>{isGenerating ? 'Generating...' : '✨ Generate Timetable'}</span>
           </button>
         </div>
       </div>
@@ -128,6 +142,27 @@ export const InputPortal: React.FC = () => {
         {activeSubTab === 'rooms' && <RoomManager />}
         {activeSubTab === 'divisions' && <DivisionManager />}
         {activeSubTab === 'institution' && <InstitutionForm />}
+      </div>
+
+      {/* Sticky Bottom Action Card for Quick Generation */}
+      <div className="mt-8 p-6 rounded-3xl bg-gradient-to-r from-emerald-600/15 via-zinc-900/10 to-teal-600/15 dark:from-emerald-950/50 dark:via-zinc-900 dark:to-teal-950/50 border border-emerald-500/30 dark:border-emerald-800/60 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="space-y-1 text-center sm:text-left">
+          <div className="font-extrabold text-sm sm:text-base text-zinc-900 dark:text-white flex items-center justify-center sm:justify-start gap-2">
+            <Sparkles className="w-5 h-5 text-emerald-500 shrink-0" />
+            <span>Ready to build your timetable?</span>
+          </div>
+          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+            Our AI solver will process all {teachers.length} teachers, {subjects.length} subjects, and {divisions.length} divisions into an optimized schedule.
+          </p>
+        </div>
+        <button
+          onClick={handleGenerate}
+          disabled={isGenerating || teachers.length === 0 || subjects.length === 0}
+          className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black text-sm sm:text-base shadow-xl shadow-emerald-500/30 flex items-center justify-center space-x-2.5 active:scale-95 transition-all shrink-0 animate-pulse"
+        >
+          <Sparkles className={`w-5 h-5 ${isGenerating ? 'animate-spin' : ''}`} />
+          <span>{isGenerating ? 'Generating Timetable...' : '✨ Generate Timetable With This Data'}</span>
+        </button>
       </div>
     </div>
   );

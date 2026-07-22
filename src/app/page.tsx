@@ -53,6 +53,11 @@ export default function Home() {
     if (currentRole === 'teacher' || currentRole === 'student') {
       setActiveTab('timetable');
     }
+    const handleTabSwitch = (e: any) => {
+      if (e.detail) setActiveTab(e.detail);
+    };
+    window.addEventListener('navigateToTab', handleTabSwitch);
+    return () => window.removeEventListener('navigateToTab', handleTabSwitch);
   }, [currentRole]);
 
   const handleToggleTheme = () => {

@@ -10,6 +10,7 @@ import {
   History,
   AlertCircle,
   CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -18,7 +19,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
-  const { currentRole, conflicts, suggestions, history } = useTimetableStore();
+  const { currentRole, conflicts, suggestions, history, generateTimetable, isGenerating } = useTimetableStore();
   const hardConflictsCount = conflicts.filter((c) => c.severity === 'hard').length;
 
   const tabs = [
@@ -124,6 +125,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
                 </div>
               </div>
             </div>
+
+            {currentRole === 'admin' && (
+              <button
+                onClick={async () => {
+                  await generateTimetable();
+                  setActiveTab('timetable');
+                  window.dispatchEvent(new CustomEvent('navigateToTab', { detail: 'timetable' }));
+                }}
+                disabled={isGenerating}
+                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 text-white font-black text-xs flex items-center justify-center space-x-1.5 shadow-md shadow-emerald-500/25 active:scale-95 transition-all"
+              >
+                <Sparkles className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
+                <span>{isGenerating ? 'Generating...' : '✨ Generate Timetable'}</span>
+              </button>
+            )}
           </div>
         </div>
 
