@@ -19,6 +19,7 @@ import { Sparkles, Plus, X } from 'lucide-react';
 
 export default function Home() {
   const {
+    clearAllData,
     currentRole,
     isAuthenticated,
     hasSeenIntro,
@@ -129,29 +130,44 @@ export default function Home() {
                 {activeTab === 'timetable' && (
                   <div className="space-y-6">
                     {schedule.length === 0 && !isGenerating && (
-                      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 text-center shadow-xs space-y-4">
-                        <div className="w-16 h-16 rounded-3xl bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
-                          <Sparkles className="w-8 h-8 animate-spin" style={{ animationDuration: '6s' }} />
+                      <div className="bg-white/90 dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800/80 backdrop-blur-xl rounded-3xl p-8 sm:p-10 text-center shadow-xl space-y-5 max-w-2xl mx-auto">
+                        <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
+                          <Sparkles className="w-8 h-8 animate-pulse" />
                         </div>
-                        <h2 className="text-2xl font-black text-zinc-900 dark:text-white">No Timetable Generated Yet</h2>
-                        <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mx-auto">
-                          Enter your faculty, subjects, rooms, and classes manually in the <strong>Inputs</strong> tab, or load our sample data, then click below to generate an optimal conflict-free schedule using Google OR-Tools.
-                        </p>
+                        <div>
+                          <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">No Timetable Generated Yet</h2>
+                          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-md mx-auto mt-2 leading-relaxed">
+                            You can immediately generate an optimal, 100% conflict-free schedule with our pre-loaded CSE faculty catalog, or clear the sample entries to add your own real teachers and subjects.
+                          </p>
+                        </div>
                         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                           <button
                             onClick={generateTimetable}
                             disabled={isGenerating}
-                            className="px-8 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition-all inline-flex items-center space-x-2"
+                            className="px-6 sm:px-8 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition-all inline-flex items-center space-x-2"
                           >
                             <Sparkles className="w-4 h-4" />
-                            <span>Generate Optimal Timetable Now</span>
+                            <span>Generate With Current Data</span>
                           </button>
                           <button
-                            onClick={loadSampleData}
-                            className="px-6 py-3.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-extrabold text-sm transition-all"
+                            onClick={() => setActiveTab('inputs')}
+                            className="px-6 py-3.5 rounded-2xl bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900 font-extrabold text-xs sm:text-sm transition-all inline-flex items-center space-x-2 shadow-md"
                           >
-                            Load Sample Faculty Data
+                            <span>✏️ Enter My Own Teachers & Subjects</span>
                           </button>
+                          {teachers.length > 0 && (
+                            <button
+                              onClick={() => {
+                                if (confirm('Clear sample data and start fresh to input your faculty?')) {
+                                  clearAllData();
+                                  setActiveTab('inputs');
+                                }
+                              }}
+                              className="px-5 py-3.5 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/80 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 font-bold text-xs sm:text-sm transition-all"
+                            >
+                              Clear Sample Data
+                            </button>
+                          )}
                         </div>
                       </div>
                     )}
@@ -207,9 +223,9 @@ export default function Home() {
                   required
                   className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
-                  <option value="">Select Subject</option>
+                  <option value="" className="bg-zinc-900 text-white">Select Subject</option>
                   {subjects.map((s) => (
-                    <option key={s.id} value={s.id}>
+                    <option key={s.id} value={s.id} className="bg-zinc-900 text-white">
                       {s.code} - {s.name} ({s.type})
                     </option>
                   ))}
@@ -224,9 +240,9 @@ export default function Home() {
                   required
                   className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
-                  <option value="">Select Teacher</option>
+                  <option value="" className="bg-zinc-900 text-white">Select Teacher</option>
                   {teachers.map((t) => (
-                    <option key={t.id} value={t.id}>
+                    <option key={t.id} value={t.id} className="bg-zinc-900 text-white">
                       {t.name} ({t.teacherId})
                     </option>
                   ))}
@@ -241,9 +257,9 @@ export default function Home() {
                   required
                   className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-medium text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
-                  <option value="">Select Classroom or Lab</option>
+                  <option value="" className="bg-zinc-900 text-white">Select Classroom or Lab</option>
                   {rooms.map((r) => (
-                    <option key={r.id} value={r.id}>
+                    <option key={r.id} value={r.id} className="bg-zinc-900 text-white">
                       {r.roomNumber} ({r.type} - {r.capacity} seats)
                     </option>
                   ))}

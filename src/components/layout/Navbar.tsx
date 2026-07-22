@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useTimetableStore } from '@/store/useTimetableStore';
-import { UserRole } from '@/lib/types';
 import {
   Sparkles,
   Wrench,
@@ -35,7 +34,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const {
     currentRole,
-    setRole,
     currentUser,
     logout,
     generateTimetable,
@@ -50,17 +48,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   } = useTimetableStore();
 
   const hardConflictsCount = conflicts.filter((c) => c.severity === 'hard').length;
-
-  const handleRoleChange = (role: UserRole) => {
-    setRole(role);
-    if (setActiveTab) {
-      if (role === 'teacher' && activeTab === 'inputs') {
-        setActiveTab('timetable');
-      } else if (role === 'student' && (activeTab === 'inputs' || activeTab === 'history' || activeTab === 'analytics')) {
-        setActiveTab('timetable');
-      }
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 dark:bg-zinc-900/90 border-b border-zinc-200/80 dark:border-zinc-800 shadow-xs transition-colors duration-200">
@@ -89,41 +76,27 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Role Switcher */}
-        <div className="flex items-center bg-zinc-100 dark:bg-zinc-800/80 p-1 rounded-xl border border-zinc-200/60 dark:border-zinc-700/60 shrink-0">
-          <button
-            onClick={() => handleRoleChange('admin')}
-            className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all duration-150 ${
-              currentRole === 'admin'
-                ? 'bg-white dark:bg-zinc-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Admin</span>
-          </button>
-          <button
-            onClick={() => handleRoleChange('teacher')}
-            className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all duration-150 ${
-              currentRole === 'teacher'
-                ? 'bg-white dark:bg-zinc-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-            }`}
-          >
-            <UserCheck className="w-3.5 h-3.5" />
-            <span>Teacher</span>
-          </button>
-          <button
-            onClick={() => handleRoleChange('student')}
-            className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all duration-150 ${
-              currentRole === 'student'
-                ? 'bg-white dark:bg-zinc-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-            }`}
-          >
-            <GraduationCap className="w-3.5 h-3.5" />
-            <span>Student</span>
-          </button>
+        {/* Logged-In User Badge */}
+        <div className="flex items-center space-x-2 bg-zinc-100/90 dark:bg-zinc-800/90 backdrop-blur-md px-3 sm:px-4 py-1.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-700/80 shadow-xs shrink-0">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+          <span className="text-xs font-extrabold text-zinc-900 dark:text-white flex items-center gap-1.5">
+            {currentRole === 'admin' ? (
+              <>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>Administrator Portal</span>
+              </>
+            ) : currentRole === 'teacher' ? (
+              <>
+                <UserCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="truncate max-w-[140px] sm:max-w-none">{currentUser?.name || `Teacher (${currentUser?.identifier})`}</span>
+              </>
+            ) : (
+              <>
+                <GraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="truncate max-w-[140px] sm:max-w-none">Student Portal ({currentUser?.identifier})</span>
+              </>
+            )}
+          </span>
         </div>
 
         {/* Action Controls */}

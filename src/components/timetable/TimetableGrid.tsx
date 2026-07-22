@@ -192,7 +192,7 @@ export const TimetableGrid: React.FC = () => {
                 className="appearance-none pl-4 pr-9 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
               >
                 {divisions.map((d) => (
-                  <option key={d.id} value={d.id}>
+                  <option key={d.id} value={d.id} className="bg-zinc-900 text-white">
                     {d.name}
                   </option>
                 ))}

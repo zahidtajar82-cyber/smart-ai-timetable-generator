@@ -121,7 +121,7 @@ export const ClassCard: React.FC<ClassCardProps> = ({
               className={`p-1 rounded transition-colors ${
                 entry.isLocked
                   ? 'bg-amber-100 dark:bg-amber-900/60 text-amber-600 dark:text-amber-300'
-                  : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 opacity-0 group-hover:opacity-100'
+                  : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700 opacity-0 group-hover:opacity-100'
               }`}
               title={entry.isLocked ? 'Pinned (AI will not move)' : 'Pin entry against AI shifts'}
             >
@@ -136,7 +136,7 @@ export const ClassCard: React.FC<ClassCardProps> = ({
                 e.stopPropagation();
                 deleteEntry(entry.id);
               }}
-              className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950 opacity-0 group-hover:opacity-100 transition-all"
+              className="p-1 rounded text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950 opacity-0 group-hover:opacity-100 transition-all"
               title="Remove session from timetable"
             >
               <Trash2 className="w-3 h-3" />
@@ -146,19 +146,19 @@ export const ClassCard: React.FC<ClassCardProps> = ({
       </div>
 
       {/* Subject Name */}
-      <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight mb-2 line-clamp-2">
+      <div className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white leading-tight mb-2 line-clamp-2">
         {subject?.name || 'Class Session'}
       </div>
 
       {/* Footer Details: Teacher & Room */}
-      <div className="space-y-1 text-[11px] font-medium text-slate-600 dark:text-slate-400">
+      <div className="space-y-1 text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
         <div className="flex items-center space-x-1.5 truncate">
-          <User className="w-3 h-3 text-slate-400 shrink-0" />
+          <User className="w-3 h-3 text-zinc-400 shrink-0" />
           <span className="truncate">{teacher?.name || 'Unassigned'}</span>
         </div>
         <div className="flex items-center space-x-1.5 truncate">
-          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
-          <span className="truncate font-semibold text-slate-700 dark:text-slate-300">
+          <MapPin className="w-3 h-3 text-zinc-400 shrink-0" />
+          <span className="truncate font-semibold text-zinc-700 dark:text-zinc-300">
             {room?.roomNumber || 'Room N/A'}
           </span>
         </div>
