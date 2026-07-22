@@ -10,9 +10,12 @@ export async function POST(req: Request) {
     // Try attempting connection to Python FastAPI OR-Tools backend first
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000); // 4s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout to allow Render free tier wake-up
 
-      const pyResponse = await fetch('http://localhost:8000/api/ai/generate', {
+      const backendUrl = process.env.PYTHON_BACKEND_URL || process.env.NEXT_PUBLIC_PYTHON_BACKEND_URL || 'https://smart-ai-timetable-generator.onrender.com';
+      const targetUrl = `${backendUrl.replace(/\/$/, '')}/api/ai/generate`;
+
+      const pyResponse = await fetch(targetUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
