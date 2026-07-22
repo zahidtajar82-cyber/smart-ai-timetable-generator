@@ -358,14 +358,14 @@ export const initialDivisions: ClassDivision[] = [
 // Pre-generated optimized initial schedule so user has immediate rich interactive data
 export const initialScheduleEntries: ScheduleEntry[] = [
   // Sem 5 - Div A (AI Specialization)
-  { id: 'se-101', subjectId: 's-1', teacherId: 't-1', roomId: 'r-102', divisionId: 'div-5a', day: 'Monday', period: 1, span: 1, isLocked: false },
+  { id: 'se-101', subjectId: 's-1', teacherId: 't-1', roomId: 'r-102', divisionId: 'div-5a', day: 'Monday', period: 3, span: 1, isLocked: false },
   { id: 'se-102', subjectId: 's-7', teacherId: 't-4', roomId: 'r-102', divisionId: 'div-5a', day: 'Monday', period: 2, span: 1, isLocked: false },
   { id: 'se-103', subjectId: 's-2', teacherId: 't-1', roomId: 'lab-201', divisionId: 'div-5a', day: 'Monday', period: 4, span: 2, isLocked: true, notes: 'GPU Cluster reserved' },
   { id: 'se-104', subjectId: 's-12', teacherId: 't-8', roomId: 'r-102', divisionId: 'div-5a', day: 'Monday', period: 6, span: 1, isLocked: false },
   
   { id: 'se-105', subjectId: 's-1', teacherId: 't-1', roomId: 'r-102', divisionId: 'div-5a', day: 'Tuesday', period: 2, span: 1, isLocked: false },
   { id: 'se-106', subjectId: 's-7', teacherId: 't-4', roomId: 'r-102', divisionId: 'div-5a', day: 'Tuesday', period: 3, span: 1, isLocked: false },
-  { id: 'se-107', subjectId: 's-8', teacherId: 't-4', roomId: 'lab-202', divisionId: 'div-5a', day: 'Tuesday', period: 4, span: 2, isLocked: false },
+  { id: 'se-107', subjectId: 's-8', teacherId: 't-4', roomId: 'lab-202', divisionId: 'div-5a', day: 'Friday', period: 4, span: 2, isLocked: false },
 
   { id: 'se-108', subjectId: 's-1', teacherId: 't-1', roomId: 'r-102', divisionId: 'div-5a', day: 'Wednesday', period: 1, span: 1, isLocked: false },
   { id: 'se-109', subjectId: 's-12', teacherId: 't-8', roomId: 'r-102', divisionId: 'div-5a', day: 'Wednesday', period: 2, span: 1, isLocked: false },
@@ -374,12 +374,12 @@ export const initialScheduleEntries: ScheduleEntry[] = [
 
   { id: 'se-112', subjectId: 's-1', teacherId: 't-1', roomId: 'r-102', divisionId: 'div-5a', day: 'Thursday', period: 2, span: 1, isLocked: false },
   { id: 'se-113', subjectId: 's-12', teacherId: 't-8', roomId: 'r-102', divisionId: 'div-5a', day: 'Thursday', period: 3, span: 1, isLocked: false },
-  { id: 'se-114', subjectId: 's-13', teacherId: 't-6', roomId: 'r-102', divisionId: 'div-5a', day: 'Thursday', period: 4, span: 1, isLocked: false },
+  { id: 'se-114', subjectId: 's-13', teacherId: 't-6', roomId: 'r-102', divisionId: 'div-5a', day: 'Tuesday', period: 1, span: 1, isLocked: false },
   { id: 'se-115', subjectId: 's-13', teacherId: 't-6', roomId: 'r-102', divisionId: 'div-5a', day: 'Thursday', period: 5, span: 1, isLocked: false },
 
-  { id: 'se-116', subjectId: 's-11', teacherId: 't-7', roomId: 'r-102', divisionId: 'div-5a', day: 'Friday', period: 1, span: 1, isLocked: false },
-  { id: 'se-117', subjectId: 's-11', teacherId: 't-7', roomId: 'r-102', divisionId: 'div-5a', day: 'Friday', period: 2, span: 1, isLocked: false },
-  { id: 'se-118', subjectId: 's-11', teacherId: 't-7', roomId: 'r-102', divisionId: 'div-5a', day: 'Friday', period: 3, span: 1, isLocked: false },
+  { id: 'se-116', subjectId: 's-11', teacherId: 't-7', roomId: 'r-102', divisionId: 'div-5a', day: 'Monday', period: 1, span: 1, isLocked: false },
+  { id: 'se-117', subjectId: 's-11', teacherId: 't-7', roomId: 'r-102', divisionId: 'div-5a', day: 'Wednesday', period: 6, span: 1, isLocked: false },
+  { id: 'se-118', subjectId: 's-11', teacherId: 't-7', roomId: 'r-102', divisionId: 'div-5a', day: 'Tuesday', period: 5, span: 1, isLocked: false },
 
   // Sem 3 - Div A (Core CSE)
   { id: 'se-201', subjectId: 's-3', teacherId: 't-2', roomId: 'r-101', divisionId: 'div-3a', day: 'Monday', period: 1, span: 1, isLocked: false },

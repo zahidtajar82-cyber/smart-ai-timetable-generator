@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { CSPSolver } from '@/lib/engine/csp-solver';
 import { TimetableValidator } from '@/lib/engine/validator';
+import { AutoRepairEngine } from '@/lib/engine/auto-repair';
 
 export async function POST(req: Request) {
   try {
@@ -58,18 +59,27 @@ export async function POST(req: Request) {
 
       if (pyResponse.ok) {
         const pyData = await pyResponse.json();
-        const pySchedule = Array.isArray(pyData) ? pyData : (pyData.schedule || []);
+        let pySchedule = Array.isArray(pyData) ? pyData : (pyData.schedule || []);
         if (pySchedule.length > 0) {
-          const evalRes = TimetableValidator.evaluateSchedule(pySchedule, teachers, subjects, rooms, divisions, config);
-          return NextResponse.json({
-            success: true,
-            engine: 'Google OR-Tools CP-SAT (Python)',
-            schedule: pySchedule,
-            metrics: evalRes.metrics,
-            conflicts: evalRes.conflicts,
-          });
+          let evalRes = TimetableValidator.evaluateSchedule(pySchedule, teachers, subjects, rooms, divisions, config);
+          if (evalRes.conflicts.filter((c) => c.severity === 'hard').length > 0) {
+            // Repair server-side if Python returned conflicts
+            const repaired = AutoRepairEngine.repairConflicts(pySchedule, teachers, subjects, rooms, divisions, config);
+            pySchedule = repaired.repairedSchedule;
+            evalRes = TimetableValidator.evaluateSchedule(pySchedule, teachers, subjects, rooms, divisions, config);
+          }
+          // If 0 conflicts or repaired successfully, return Python schedule
+          if (evalRes.conflicts.filter((c) => c.severity === 'hard').length === 0) {
+            return NextResponse.json({
+              success: true,
+              engine: 'Google OR-Tools CP-SAT (Python)',
+              schedule: pySchedule,
+              metrics: evalRes.metrics,
+              conflicts: evalRes.conflicts,
+            });
+          }
         }
-        console.log('Python OR-Tools returned empty schedule. Falling back to TypeScript CSP engine.');
+        console.log('Python OR-Tools returned conflicts or empty schedule. Falling back to TypeScript CSP engine.');
       }
     } catch (e) {
       // Python backend unreachable or timed out -> gracefully use our TypeScript CSP Solver
